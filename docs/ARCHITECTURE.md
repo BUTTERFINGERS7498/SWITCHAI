@@ -36,7 +36,7 @@ escalations, idempotent), `overdue`, `cost`, `can_depart`, `depart`, `handover_s
 ## REST API (`homeward/sim/app.py`, built in P2; port 8765; OpenAPI at `/docs`)
 Errors: `{"error":{"code","message","details"}}`; 404 NOT_FOUND, 403 HUMAN_ONLY/FORBIDDEN_ROLE, 422 VALIDATION,
 409 INVALID_TRANSITION/DEPENDENCY_UNMET/PICKUP_TOO_EARLY/APPROVAL_REQUIRED. Times ISO-8601 (naive = UTC).
-Actors: `{"id","role","type": human|agent|system}`.
+Actors: `{"id","role","type": human|agent|system}`. Agents use role `coordinator` and put the human source in `detail`.
 
 | Method + path | Purpose | Who |
 |---|---|---|
@@ -45,7 +45,7 @@ Actors: `{"id","role","type": human|agent|system}`.
 | `GET /patients`, `GET /patients/{bed}` | ward list with blocker / one patient + eligibility + plan | agents |
 | `POST /patients/{bed}/mffd {"pathway","actor","letter_eta?"}` | declare medically fit (doctor only) | human |
 | `GET /patients/{bed}/plan` · `/blocker` · `/handover` · `/ledger` | tasks / blocker+cost+overdue / shift handover text / audit | agents |
-| `PATCH /patients/{bed}/tasks/{id} {"status","actor","eta?"}` | validated transition (not TTO, not transport completion) | agents/humans |
+| `PATCH /patients/{bed}/tasks/{id} {"status","actor","eta?","detail?"}` | validated transition (not TTO, not transport completion) | agents/humans |
 | `GET /patients/{bed}/tto`, `POST /patients/{bed}/tto/request {"actor","priority"}` | pharmacy status / send TTO request | pharmacy agent |
 | `GET /patients/{bed}/transport/eligibility` | vehicle + earliest pickup | transport agent |
 | `GET /transport/slots?vehicle=&after=` | free 15-min slots 11:00-18:00 | transport agent |

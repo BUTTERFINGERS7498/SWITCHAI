@@ -82,6 +82,7 @@ class TaskPatch(BaseModel):
     status: TaskStatus
     actor: ActorIn
     eta: Optional[datetime] = None
+    detail: Optional[str] = Field(default=None, max_length=300)  # e.g. "reported by nurse-amy: Sarah told 10:05"
 
 
 class TtoRequestIn(BaseModel):
@@ -200,7 +201,7 @@ def get_handover(bed: int):
 def patch_task(bed: int, task_id: str, body: TaskPatch):
     s = store()
     with s.lock:
-        entries = s.update_task(bed, task_id, body.status, body.actor.to_actor(), utc(body.eta))
+        entries = s.update_task(bed, task_id, body.status, body.actor.to_actor(), utc(body.eta), body.detail)
     return {"task": next(t for t in s.plan_view(bed)["tasks"] if t["id"] == task_id), "ledger": ledger_out(entries)}
 
 

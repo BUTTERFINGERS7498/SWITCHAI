@@ -12,7 +12,7 @@ NURSE = c.Actor("nurse-amy", c.Role.NURSE)
 DOCTOR = c.Actor("dr-raj", c.Role.DOCTOR)
 PHARMACIST = c.Actor("ph-lee", c.Role.PHARMACIST)
 BED_MGR = c.Actor("bm-kim", c.Role.BED_MANAGER)
-AGENT_LEAD = c.Actor("discharge-lead", c.Role.NURSE, c.ActorType.AGENT)
+AGENT_LEAD = c.Actor("discharge-lead", c.Role.COORDINATOR, c.ActorType.AGENT)
 AGENT_TRANSPORT = c.Actor("transport", c.Role.TRANSPORT, c.ActorType.AGENT)
 
 

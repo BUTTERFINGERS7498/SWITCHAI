@@ -71,7 +71,7 @@ def test_read_handover_is_plain_text(fresh):
 
 def test_write_rejection_exit_1_with_reason(fresh):
     run(fresh, "write", "POST", "/patients/12/mffd", '{"pathway":"P0","actor":{"id":"dr-raj","role":"doctor"}}')
-    body = json.dumps({"status": "done", "actor": {"id": "discharge-lead", "role": "nurse", "type": "agent"}})
+    body = json.dumps({"status": "done", "actor": {"id": "discharge-lead", "role": "coordinator", "type": "agent"}})
     code, out = run(fresh, "write", "PATCH", "/patients/12/tasks/t3", body)
     assert code == 1 and out.startswith("REJECTED HUMAN_ONLY:")
     assert last_json(out)["error"]["code"] == "HUMAN_ONLY"

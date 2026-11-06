@@ -27,3 +27,4 @@
 | D23 | CLI paths without leading `/`; CLI undoes Git Bash path rewriting and only accepts known API roots | Found live: Git Bash turned `/health` into `C:/Program Files/Git/health` | P3 |
 | D24 | `.claude/settings.json` committed: allow `read:*`/`test:*`, ask `write:*` | Same approval behaviour for anyone who clones and runs the agents in this folder | P3 |
 | D25 | MFFD is entered by the doctor in the hospital system (sim EPR / scenario runner), never by an agent from chat; agents read it and open the room | `discharge-lead` refused to record a clinical decision under a doctor's name; that refusal is correct | P3 spike |
+| D26 | Contract 1.2.0: agents act as `{"type":"agent","role":"coordinator"}`; task PATCH takes `detail` for human attribution ("reported by nurse-amy: ...") | `discharge-lead` refused to pose as a nurse or sign off something it didn't witness | P3 spike |

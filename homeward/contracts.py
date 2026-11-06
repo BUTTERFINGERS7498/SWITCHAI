@@ -13,7 +13,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-CONTRACT_VERSION = "1.1.0"
+CONTRACT_VERSION = "1.2.0"
 
 # --- Constants (from the dossier; illustrative, synthetic) -------------------
 BED_DAY_GBP = 562.0
@@ -36,6 +36,7 @@ class Role(str, Enum):
     TRANSPORT = "transport"
     BED_MANAGER = "bed_manager"
     SOCIAL_WORKER = "social_worker"
+    COORDINATOR = "coordinator"   # agents acting as themselves; never a clinical role
 
 
 class ActorType(str, Enum):

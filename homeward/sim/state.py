@@ -203,7 +203,7 @@ class Store:
 
     # --- tasks ---------------------------------------------------------------------
     def update_task(self, bed: int, task_id: str, status: TaskStatus, actor: Actor,
-                    eta: Optional[datetime] = None) -> list[LedgerEntry]:
+                    eta: Optional[datetime] = None, detail: Optional[str] = None) -> list[LedgerEntry]:
         p = self.plan(bed)
         t = e.get_task(p, task_id)
         if t.kind in (TaskKind.TTO_VERIFY, TaskKind.TTO_DISPENSE) and actor.type == ActorType.AGENT:
@@ -213,7 +213,7 @@ class Store:
         if t.kind == TaskKind.TRANSPORT_BOOKED and status in (TaskStatus.IN_PROGRESS, TaskStatus.DONE):
             raise HomewardError(ErrorCode.APPROVAL_REQUIRED,
                                 "transport is confirmed through a booking approval", {"task_id": task_id})
-        entries = e.apply_transition(p, task_id, status, actor, self.clock, eta=eta)
+        entries = e.apply_transition(p, task_id, status, actor, self.clock, eta=eta, detail=detail)
         self._log(entries)
         return entries
 

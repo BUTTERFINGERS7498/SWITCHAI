@@ -5,7 +5,7 @@ from homeward.sim.app import app
 
 DOCTOR = {"id": "dr-raj", "role": "doctor"}
 NURSE = {"id": "nurse-amy", "role": "nurse"}
-LEAD = {"id": "discharge-lead", "role": "nurse", "type": "agent"}
+LEAD = {"id": "discharge-lead", "role": "coordinator", "type": "agent"}
 PHARM_AGENT = {"id": "pharmacy-liaison", "role": "pharmacist", "type": "agent"}
 TRANSPORT = {"id": "transport", "role": "transport", "type": "agent"}
 DAY = "2026-11-07T"
@@ -51,7 +51,7 @@ def mffd(api, bed=12, pathway="P0"):
 # --- basics ----------------------------------------------------------------------------
 def test_health_and_reset(api):
     h = api.get("/health").json()
-    assert h["ok"] and h["now"] == t("10:00") and h["contract"] == "1.1.0"
+    assert h["ok"] and h["now"] == t("10:00") and h["contract"] == "1.2.0"
     clock(api, "11:00")
     assert api.post("/reset", json={}).json()["now"] == t("10:00")
 
@@ -259,3 +259,21 @@ def test_escalation_shows_in_ledger(api):
     clock(api, "12:00")  # TTO never requested: verify target 60 -> nudges, escalate at 12:00
     actions = [x["action"] for x in api.get("/patients/12/ledger").json()]
     assert actions.count("nudge") >= 2 and "escalation" in actions
+
+
+def test_agent_records_as_itself_with_attribution(api):
+    mffd(api)
+    t5 = task_id(api, 12, "family_informed")
+    r = api.patch(f"/patients/12/tasks/{t5}", json={"status": "done", "actor": LEAD,
+                                                    "detail": "reported by nurse-amy: daughter Sarah told at 10:05"})
+    assert r.status_code == 200, r.text
+    row = r.json()["ledger"][0]
+    assert row["actor"] == {"id": "discharge-lead", "role": "coordinator", "type": "agent"}
+    assert row["detail"] == "reported by nurse-amy: daughter Sarah told at 10:05"
+
+
+def test_coordinator_agent_still_cannot_do_clinical_or_approve(api):
+    mffd(api)
+    err(api.patch(f"/patients/12/tasks/{task_id(api, 12, 'letter_signed')}",
+                  json={"status": "done", "actor": LEAD}), 403, "HUMAN_ONLY")
+    err(api.post("/patients/12/mffd", json={"pathway": "P0", "actor": LEAD}), 403, "HUMAN_ONLY")
