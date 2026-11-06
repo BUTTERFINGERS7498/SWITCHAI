@@ -18,14 +18,20 @@ People (Slack)  ->  Switch (rooms, roles, approvals, room docs, addressing)
 - Stack: Python 3.12+ (stdlib contract + engine; FastAPI/SQLite in sim), React board. $0, local, self-hosted.
 - Entrypoint: `python scripts/homeward.py <setup|demo|scenario|test>`; Makefile is a thin wrapper.
 
-## Engine rules (TASK-002 implements)
+## Engine rules (`homeward/engine.py`, built in P1)
+API: `build_plan`, `apply_transition` (returns ledger entries), `check_pickup`, `blocker`, `tick` (nudges and
+escalations, idempotent), `overdue`, `cost`, `can_depart`, `depart`, `handover_summary`.
 - Tasks per pathway: `PATHWAY_TASKS`. Dependencies: `DEPENDS_ON`. Owners: `OWNER_ROLE`.
 - Status changes only via `TRANSITIONS`. Each change appends a `LedgerEntry`.
 - Pickup rule: `pickup >= max(tto_ready_eta, letter_eta) + PICKUP_BUFFER_MIN` else `PICKUP_TOO_EARLY`.
 - Targets: `TARGET_MINUTES`; after `NUDGES_BEFORE_ESCALATION` nudges, escalate to `bed_manager` (ledger entry).
 - Blocker = the unfinished task on the critical path (latest ETA among not-DONE tasks).
 - Cost: `BED_HOUR_GBP` x hours since `fit_at` (until `departed_at`).
-- Departure is allowed only when every task is DONE.
+- Departure is allowed only when every task is DONE, and only a human can confirm it.
+- A task in AWAITING_APPROVAL can only be completed by a HUMAN (`APPROVAL_REQUIRED`), so agents cannot self-approve.
+- Humans may complete tasks they own; a nurse may also complete any non-clinical task (ward override).
+  Other roles get `FORBIDDEN_ROLE`. Agents may complete non-clinical tasks that need no approval.
+- Nudges at 1x and 1.5x the target, escalation to bed_manager at 2x; BLOCKED -> READY restarts the clock.
 
 ## REST API (TASK-003 implements; all bodies JSON; times ISO-8601 UTC; bed = int)
 Errors: `{"error":{"code","message","details"}}`; 404 NOT_FOUND, 409 INVALID_TRANSITION/DEPENDENCY_UNMET/

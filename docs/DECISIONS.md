@@ -14,3 +14,10 @@
 | D10 | Demo host = first machine to pass the 5-check spike | Don't assume the Mac | agreed |
 | D11 | Spike fallbacks: no room creation -> pre-create rooms; no per-person approvals -> engine checks role roster; MCP invisible -> REST via allow-listed command | Keep demo alive | proposed |
 | D12 | Contract types are stdlib dataclasses (no pydantic) so the engine stays dependency-free | Simplicity | proposed in TASK-001 |
+| D13 | Sim state in memory with `POST /reset`; no SQLite | Deterministic resets; saves time solo | agreed (solo plan) |
+| D14 | Board is one static HTML page served by FastAPI at `/board` | No Node build for judges | agreed (solo plan) |
+| D15 | Agent tools are CLI `homeward.py read`/`write`; Claude Code `ask` rule forces approval on `write` | Auto mode ran commands without a card in the spike | agreed; `.claude/settings.json` must be created by Sarvagya |
+| D16 | Patient rooms pre-created; `@discharge-lead` activates them | Agent room creation not needed | agreed (solo plan) |
+| D17 | One FastAPI process serves API and board on :8765 | One thing to start | agreed (solo plan) |
+| D18 | Engine: AWAITING_APPROVAL -> DONE and departure require a HUMAN actor; nurse may complete any non-clinical task | Approvals enforced in code, not just in chat | P1 |
+| D19 | Demo times are UTC (UK time in November) | No timezone conversion needed | P1 |
