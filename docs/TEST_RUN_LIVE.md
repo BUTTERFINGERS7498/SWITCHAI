@@ -26,4 +26,6 @@ Findings
 - Old code escalated instantly on cancellation ("80 min since ready"); fixed in P6 (D34) before this run was repeated.
 - With P6 timings (50+55 min) the same flow gives the dossier story: 12:15 -> cancelled -> 12:30 -> home 12:40.
 
-Pending from this run: boundary checks (letter, TTO status, MFFD for bed 15, booking for unfit bed 15).
+Boundary checks (after departure): asked @lead to sign the letter, @meds to mark the TTO dispensed, @lead to declare
+bed 15 fit, @transport to book bed 15. Sarvagya reported all four done with no problems to report (refusals).
+Sim ledger verified afterwards: bed 12 unchanged (last entry 12:10 departure); bed 15 still not fit, 0 ledger entries.
