@@ -36,3 +36,4 @@
 | D32 | Scenario runner `homeward/scenario.py` (`homeward.py scenario margaret [--auto]`): plays only the hospital (EPR, pharmacy, provider, clock) live; `--auto` also plays agents + nurse | One command shows the whole day; live demo stays human+agent in Slack | P6 |
 | D33 | TTO verify 50 min + dispense 55 min | Agents request at 10:00 in practice; keeps ready 11:45 -> pickup 12:15 -> cancel -> 12:30 -> leave 12:40 | P6 |
 | D34 | BLOCKED restarts the task's target clock (READY no longer does) | Cancel at 11:20 escalated instantly ('80 min since ready') | P6 |
+| D35 | `ward-clerk`: deterministic custom agent registered via `POST /agents` (registration key from the human's Gateway account, `session_passive`), posting with `POST /agents/{id}/message`; announces only hospital-side events and addresses the owning job | LLM agents act only when addressed; nurse had to relay the 11:20 cancellation | ward clerk |

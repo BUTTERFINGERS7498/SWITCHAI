@@ -5,6 +5,7 @@
   python scripts/homeward.py test [pytest args] run the test suite
   python scripts/homeward.py demo [--port N]    start the simulator + board on http://127.0.0.1:8765
   python scripts/homeward.py scenario margaret [--auto]   run the demo day (needs `demo` running)
+  python scripts/homeward.py clerk register|rooms|run     ward-clerk Switch agent (see homeward/clerk.py)
 
 Agent tools (talk to the running sim; base URL from HOMEWARD_URL, default http://127.0.0.1:8765):
   python scripts/homeward.py read <path>                   GET only, e.g. read patients/12/blocker
@@ -175,14 +176,20 @@ def cmd_write(args):
     return emit(path, status, out)
 
 
-COMMANDS = {"setup": cmd_setup, "test": cmd_test, "demo": cmd_demo, "scenario": cmd_scenario,
+def cmd_clerk(args):
+    sys.path.insert(0, str(ROOT))
+    from homeward import clerk
+    return clerk.main(args)
+
+
+COMMANDS = {"setup": cmd_setup, "test": cmd_test, "demo": cmd_demo, "scenario": cmd_scenario, "clerk": cmd_clerk,
             "read": cmd_read, "write": cmd_write}
 
 
 def main(argv):
     for stream in (sys.stdout, sys.stderr):
         try:
-            stream.reconfigure(encoding="utf-8")
+            stream.reconfigure(encoding="utf-8", line_buffering=True)
         except (AttributeError, ValueError):
             pass
     if not argv or argv[0] not in COMMANDS:
