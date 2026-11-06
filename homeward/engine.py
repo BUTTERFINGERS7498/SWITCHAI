@@ -122,7 +122,7 @@ def apply_transition(p: Patient, task_id: str, dst: TaskStatus, actor: Actor, no
         t.eta = eta
     if dst == TaskStatus.DONE:
         t.eta = now  # actual completion time
-    if dst == TaskStatus.READY:  # e.g. BLOCKED -> READY after a rebook: restart the clock
+    if dst == TaskStatus.BLOCKED:  # something external broke it: the clock restarts from now
         t.ready_at, t.nudges = now, 0
     entries = [_entry(p, actor, f"task.{dst.value}", now, t, detail=detail, approval_id=approval_id)]
 

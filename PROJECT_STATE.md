@@ -22,11 +22,11 @@ See `docs/DECISIONS.md`.
 | P3 | agent CLI `homeward.py read/write` | done (7 end-to-end CLI tests) |
 | P4 | Switch rooms, roles, approvals | files done (`switch/`); Console/Slack setup in progress |
 | P5 | board page | done (`/board`) |
-| P6 | scenario runner | pending |
+| P6 | scenario runner | done (`homeward.py scenario margaret [--auto]`) |
 | P7-P9 | README, video, submit | pending |
 
 ## Completed
-- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 76 tests pass: `python scripts/homeward.py test`.
+- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 79 tests pass: `python scripts/homeward.py test`.
 
 ## Pending / issues
 - Switch spike not yet run (needs human at Console). Not verified that Switch runs on either machine.

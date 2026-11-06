@@ -2,7 +2,7 @@
 seeded history is a valid ledger, then the clock is left at 10:00 for the demo.
 
 Margaret Jones (bed 12) is the demo patient: not yet declared fit at 10:00.
-With Homeward: TTO requested 10:20 -> verified 11:00 -> ready 11:45; letter due 11:00;
+With Homeward: TTO requested 10:00 -> verified 10:50 -> ready 11:45; letter due 11:00;
 earliest pickup 12:05 -> slot 12:15; provider cancels at 11:20 -> rebook 12:30 -> leaves 12:40.
 Without Homeward (dossier baseline) she left at 19:10.
 """

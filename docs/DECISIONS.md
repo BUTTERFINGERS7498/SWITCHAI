@@ -33,3 +33,6 @@
 | D29 | CLI encodes `+` in query strings | Timezone offsets in `after=` were turning into spaces | P4 |
 | D30 | Board = one static page `homeward/sim/static/board.html` (vanilla JS, polls `/board/ward` every 2 s, text-only rendering of ledger); shows baseline-vs-actual departure | No build step; agent-written text can't inject HTML | P5 |
 | D31 | `TARGET_MET_AT`: transport's 30-min target is met when the booking is approved (IN_PROGRESS); TTO clocks keep running while in progress | Arthur showed 'Needs attention' with a confirmed car | P5 |
+| D32 | Scenario runner `homeward/scenario.py` (`homeward.py scenario margaret [--auto]`): plays only the hospital (EPR, pharmacy, provider, clock) live; `--auto` also plays agents + nurse | One command shows the whole day; live demo stays human+agent in Slack | P6 |
+| D33 | TTO verify 50 min + dispense 55 min | Agents request at 10:00 in practice; keeps ready 11:45 -> pickup 12:15 -> cancel -> 12:30 -> leave 12:40 | P6 |
+| D34 | BLOCKED restarts the task's target clock (READY no longer does) | Cancel at 11:20 escalated instantly ('80 min since ready') | P6 |

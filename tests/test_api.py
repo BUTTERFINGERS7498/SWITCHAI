@@ -110,7 +110,6 @@ def test_agent_cannot_mark_transport_done_directly(api):
 # --- pharmacy ----------------------------------------------------------------------------
 def test_tto_request_runs_on_the_clock(api):
     mffd(api)
-    clock(api, "10:20")
     r = api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT, "priority": "urgent"})
     assert r.json()["status"] == "verifying" and r.json()["ready_eta"] == t("11:45")
     err(api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT}), 422, "VALIDATION")
@@ -126,10 +125,10 @@ def test_tto_delay_event_moves_eta(api):
     mffd(api)
     api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT})
     api.post("/events", json={"type": "tto_delayed", "bed": 12, "minutes": 30})
-    assert api.get("/patients/12/tto").json()["ready_eta"] == t("11:55")
-    clock(api, "10:40")
-    assert task(api, 12, "tto_verify")["status"] == "in_progress"  # old 10:40 event superseded
-    clock(api, "11:10")
+    assert api.get("/patients/12/tto").json()["ready_eta"] == t("12:15")
+    clock(api, "10:50")
+    assert task(api, 12, "tto_verify")["status"] == "in_progress"  # old 10:50 event superseded
+    clock(api, "11:20")
     assert task(api, 12, "tto_verify")["status"] == "done"
 
 
@@ -145,7 +144,6 @@ def test_eligibility_and_slots(api):
 
 def test_booking_rules(api):
     mffd(api)
-    clock(api, "10:20")
     api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT})
     err(api.post("/patients/12/transport/bookings", json={"slot": t("12:00"), "actor": TRANSPORT}),
         409, "PICKUP_TOO_EARLY")
@@ -196,7 +194,6 @@ def test_margaret_full_journey_with_curveball(api):
     b0 = api.get("/patients/12/blocker").json()
     assert b0["summary"].startswith("Margaret is waiting on:")
 
-    clock(api, "10:20")
     api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT})
     assert api.get("/patients/12/transport/eligibility").json()["earliest_pickup"] == t("12:05")
 

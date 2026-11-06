@@ -47,8 +47,8 @@ class Tto:
     status: str = "not_requested"   # not_requested | verifying | dispensing | ready
     requested_at: Optional[datetime] = None
     priority: str = "routine"
-    verify_minutes: int = 40
-    dispense_minutes: int = 45
+    verify_minutes: int = 50
+    dispense_minutes: int = 55
     verified_eta: Optional[datetime] = None
     ready_eta: Optional[datetime] = None
 

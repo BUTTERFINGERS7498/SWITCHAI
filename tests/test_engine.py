@@ -229,17 +229,21 @@ def test_tick_catches_up_in_one_call():
     assert actions == ["nudge", "nudge", "escalation"]
 
 
-def test_rebook_restarts_clock():
+def test_block_restarts_clock_and_rebook_keeps_it():
     p = margaret()
     tr = tid(p, c.TaskKind.TRANSPORT_BOOKED)  # target 30
     e.tick(p, at(30))
     assert e.find_task(p, c.TaskKind.TRANSPORT_BOOKED).nudges == 1
+    e.apply_transition(p, tr, S.AWAITING_APPROVAL, AGENT_TRANSPORT, at(40))
+    e.apply_transition(p, tr, S.IN_PROGRESS, NURSE, at(41), eta=at(135))
     sim = c.Actor("sim", c.Role.TRANSPORT, c.ActorType.SYSTEM)
-    e.apply_transition(p, tr, S.BLOCKED, sim, at(80))
-    e.apply_transition(p, tr, S.READY, AGENT_TRANSPORT, at(81))
+    e.apply_transition(p, tr, S.BLOCKED, sim, at(80))          # provider cancels at 11:20
     t = e.get_task(p, tr)
-    assert t.nudges == 0 and t.ready_at == at(81)
-    assert [x for x in e.tick(p, at(100)) if x.task_id == tr] == []
+    assert t.nudges == 0 and t.ready_at == at(80)
+    assert [x for x in e.tick(p, at(80)) if x.task_id == tr] == []   # no instant escalation
+    e.apply_transition(p, tr, S.READY, AGENT_TRANSPORT, at(85))      # rebooking
+    assert e.get_task(p, tr).ready_at == at(80)                      # clock keeps counting from the cancel
+    assert [x.action for x in e.tick(p, at(110)) if x.task_id == tr] == ["nudge"]
 
 
 def test_done_tasks_are_not_nudged():

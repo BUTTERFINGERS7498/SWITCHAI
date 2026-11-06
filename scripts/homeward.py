@@ -4,7 +4,7 @@
   python scripts/homeward.py setup              create .venv and install requirements.txt
   python scripts/homeward.py test [pytest args] run the test suite
   python scripts/homeward.py demo [--port N]    start the simulator + board on http://127.0.0.1:8765
-  python scripts/homeward.py scenario <name>    run a scripted scenario (P6)
+  python scripts/homeward.py scenario margaret [--auto]   run the demo day (needs `demo` running)
 
 Agent tools (talk to the running sim; base URL from HOMEWARD_URL, default http://127.0.0.1:8765):
   python scripts/homeward.py read <path>                   GET only, e.g. read patients/12/blocker
@@ -65,8 +65,9 @@ def cmd_demo(args):
 
 
 def cmd_scenario(args):
-    print("`scenario` is not implemented yet (P6).")
-    return 1
+    sys.path.insert(0, str(ROOT))
+    from homeward import scenario
+    return scenario.main(args)
 
 
 def base_url() -> str:
