@@ -1,4 +1,4 @@
-# Switch spike (P0)
+# Switch spike (P0) — ALL 5 CHECKS PASS
 
 Machine: Sarvagya's Windows 11 laptop. Switch Console v0.40.1 (installer signed by SandboxAQ, SHA-256
 575262E7…2332). Docker Desktop 29.8.0. Claude Code 2.1.319. Chat surface: Slack (Team RE:SET), Socket Mode,
@@ -9,7 +9,7 @@ so no public URL is needed (per docs.switchagents.ai Slack page).
 | 1 | Local server running from Console | PASS (2nd attempt) | First start failed: "switch-core stopped during startup", empty switch-core.log. Native mode (bundled Postgres 16 + switch-core 0.31.0 venv), not Docker. Run by hand, switch-core started fine, so the likely cause is a slow first start (fresh venv). Console retry at 01:47 IST succeeded; server on 127.0.0.1:52755 returns 200. If it recurs: quit Console fully and reopen. |
 | 2 | Claude Code agent answers in a Slack room (by name, then by @role) | PASS (by name) | `discharge-lead` (Claude Code, this computer, dir = repo, Auto mode on, bypass off, "Me and my agents") registered 02:09, added to `homeward-spike`, replied in Slack. Role addressing not tested yet (P4). |
 | 3 | Room document write then read-back | PASS | 02:13: agent created room doc `spike-checklist`, read back "bed 12: TTO pending" (3 tool calls, 10 s). |
-| 4 | Approval card on a write command while reads are auto-allowed | NOT YET | Auto mode ran `homeward.py test` with no card. Fix (D15): project `.claude/settings.json` with `ask` rule for `homeward.py write:*` and `allow` for `read:*`/`test:*`; Sarvagya to create it (agent tooling blocked from editing permission files), then re-test after `/reset @discharge-lead`. |
+| 4 | Approval card on a write command while reads are auto-allowed | PASS | 03:35: with `.claude/settings.json` (allow `read:*`, ask `write:*`) and a fresh session, `homeward.py write PATCH patients/12/tasks/t5` showed a Slack card with buttons before running; Sarvagya clicked Allow. Reads run without a card. |
 | 5 | Agent session can run our CLI | PASS | 02:12: agent ran `python scripts/homeward.py test` in the repo, replied "9 passed in 0.02s" (2 tool calls, 11 s). `/clock` arrives with the sim (P2). |
 
 ## Slack connection (02:03 IST)

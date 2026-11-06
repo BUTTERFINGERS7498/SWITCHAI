@@ -16,7 +16,7 @@ See `docs/DECISIONS.md`.
 ## Task ownership and status (solo since 2026-11-07; plan: docs/IMPLEMENTATION_PLAN.md)
 | Phase | Scope | Status |
 |---|---|---|
-| P0 | Switch spike | done except check 4 (approval card) - see docs/SPIKE.md |
+| P0 | Switch spike | done, all 5 checks pass (docs/SPIKE.md) |
 | P1 | readiness engine `homeward/engine.py` | done (32 tests) |
 | P2 | simulator `homeward/sim/` | done (19 API tests) |
 | P3 | agent CLI `homeward.py read/write` | done (7 end-to-end CLI tests) |
@@ -26,7 +26,7 @@ See `docs/DECISIONS.md`.
 | P7-P9 | README, video, submit | pending |
 
 ## Completed
-- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 67 tests pass: `python scripts/homeward.py test`.
+- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 70 tests pass: `python scripts/homeward.py test`.
 
 ## Pending / issues
 - Switch spike not yet run (needs human at Console). Not verified that Switch runs on either machine.
