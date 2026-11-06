@@ -16,7 +16,7 @@
 
 **[Demo video: link to be added]** <!-- TODO: paste the video URL before submitting -->
 
-<sub>Built during the <b>Flip the Switch</b> hackathon (WeMakeDevs × DevTools Academy × Switch), Track 01: Best Business Workflow.</sub>
+<sub>By <b>Team RE:SET</b> · built during the <b>Flip the Switch</b> hackathon (WeMakeDevs × DevTools Academy × Switch), Track 01: Best Business Workflow.</sub>
 
 </div>
 
@@ -345,8 +345,8 @@ Issues and pull requests are welcome. Run `python scripts/homeward.py test` befo
 
 **[License: to be chosen]** <!-- TODO: add a LICENSE file (e.g. MIT) and update this section and the badge -->
 
-## 🙌 Team & acknowledgements
+## 🙌 Team RE:SET
 
-- **[Team / author names: to be confirmed]** <!-- TODO -->
+- **Raghav Sharma** ([raghav-shell](https://github.com/raghav-shell)): problem research and the Flip the Switch strategy dossier that chose Homeward, plus the original requirements brief.
+- **Sarvagya Sharma** ([BUTTERFINGERS7498](https://github.com/BUTTERFINGERS7498)): build, Switch setup and testing.
 - Built on [Switch](https://github.com/sandbox-quantum/switch) by SandboxAQ, for the Flip the Switch hackathon by WeMakeDevs and DevTools Academy.
-- Problem research: the team's Flip the Switch problem & strategy dossier.
