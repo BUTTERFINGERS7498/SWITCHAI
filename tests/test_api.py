@@ -304,3 +304,10 @@ def test_board_page_and_totals(api):
     assert d["totals"]["approvals"] == 1  # Arthur's seeded booking, approved by nurse-amy
     m = next(b for b in d["beds"] if b["bed"] == 12)
     assert m["baseline_departure"] == t("19:10")
+
+
+def test_board_people_totals(api):
+    d = api.get("/board/ward").json()["totals"]
+    assert d["ready"] == 2 and d["home"] == 0 and d["clinical_by_agents"] == 0 and d["hours_freed"] == 0
+    clock(api, "11:10")
+    assert api.get("/board/ward").json()["totals"]["home"] == 1   # Arthur

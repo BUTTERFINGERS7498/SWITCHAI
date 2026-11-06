@@ -167,7 +167,7 @@ def blocker(p: Patient, now: datetime) -> Blocker:
         t = max(open_tasks, key=lambda x: (x.eta or far, -order[x.id]))
     state = "BLOCKED: " if t.status == TaskStatus.BLOCKED else ""
     summary = (f"{first} is waiting on: {state}{TASK_LABEL[t.kind]} (ETA {_hhmm(t.eta)}). "
-               f"Owner: {t.owner_role.value}.")
+               f"Owner: {t.owner_role.value.replace('_', ' ')}.")
     return Blocker(p.bed, t.id, summary, t.owner_role, t.eta)
 
 

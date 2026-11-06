@@ -417,7 +417,24 @@ class Store:
         lost = sum(e.cost(p, self.clock)["hours"] for p in self.plans.values())
         approvals = sum(1 for x in self.ledger
                         if x.approval_id and x.actor.type == ActorType.HUMAN and x.at >= self.created_at)
+        agent_rows = [x for x in self.ledger if x.actor.type == ActorType.AGENT]
+        clinical_kinds = {TaskKind.LETTER_SIGNED}
+        clinical_by_agents = 0
+        for x in agent_rows:
+            p = self.plans.get(x.bed)
+            t = next((t for t in p.tasks if t.id == x.task_id), None) if p and x.task_id else None
+            if x.action == "patient.mffd" or (t is not None and t.kind in clinical_kinds):
+                clinical_by_agents += 1
+        freed = 0.0
+        for bed, p in self.plans.items():
+            base = self.inpatients[bed].baseline_departure
+            if p.departed_at and base and base > p.departed_at:
+                freed += (base - p.departed_at).total_seconds() / 3600
         return {"now": self.clock.isoformat(), "beds": beds,
                 "totals": {"bed_hours": round(lost, 2), "gbp": round(lost * e.BED_HOUR_GBP, 2),
-                           "approvals": approvals},
+                           "approvals": approvals, "agent_actions": len(agent_rows),
+                           "clinical_by_agents": clinical_by_agents,
+                           "ready": sum(1 for p in self.plans.values() if not p.departed_at),
+                           "home": sum(1 for p in self.plans.values() if p.departed_at),
+                           "hours_freed": round(freed, 2)},
                 "ledger": self.ledger_view(limit=12)}

@@ -1,220 +1,458 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ward 7 board · Homeward</title>
+<title>Ward 7 · Homeward</title>
 <style>
   :root {
-    --bg: #f4f6f8; --panel: #ffffff; --ink: #14212b; --muted: #5b6b78; --line: #dde3e8;
-    --blue: #1f6feb; --blue-bg: #e8f0fe; --green: #1a7f37; --green-bg: #e6f4ea;
-    --amber: #9a6700; --amber-bg: #fff4d6; --red: #c62828; --red-bg: #fdecea;
-    --violet: #6f42c1; --violet-bg: #f1ebfb; --grey-bg: #eef1f4;
-    --radius: 12px; --shadow: 0 1px 2px rgba(20,33,43,.06), 0 2px 8px rgba(20,33,43,.05);
+    --bg: #f6f3ee; --panel: #fffdf9; --ink: #1d2730; --muted: #55636f; --line: #e3ddd3; --track: #ebe5da;
+    --accent: #0b6e4f; --accent-bg: #e3f2ea; --blue: #1c5fc4; --blue-bg: #e7eefb;
+    --amber: #8a5a00; --amber-bg: #fdf1d6; --red: #b42318; --red-bg: #fde8e6;
+    --violet: #5b3cc4; --violet-bg: #eeeafc; --grey-bg: #efebe4; --ghost: #b42318;
+    --radius: 14px; --shadow: 0 1px 2px rgba(29,39,48,.05), 0 6px 18px rgba(29,39,48,.06);
+    --fs: 16px;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0f1419; --panel: #171e25; --ink: #e6edf3; --muted: #93a1ad; --line: #2a333c;
-      --blue: #79b0ff; --blue-bg: #13233a; --green: #56d364; --green-bg: #12291a;
-      --amber: #e3b341; --amber-bg: #2d2412; --red: #ff7b72; --red-bg: #33191a;
-      --violet: #c4a6ff; --violet-bg: #251c38; --grey-bg: #1f272f;
-      --shadow: none;
-    }
-  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #11161b; --panel: #182028; --ink: #e8eef3; --muted: #a2b0bc; --line: #2a343e; --track: #26303a;
+    --accent: #5fd39a; --accent-bg: #133024; --blue: #8ab4ff; --blue-bg: #17243a;
+    --amber: #f0c060; --amber-bg: #2f2512; --red: #ff8a80; --red-bg: #361a19;
+    --violet: #c3b0ff; --violet-bg: #251e3d; --grey-bg: #202a33; --ghost: #ff8a80; --shadow: none; } }
+  :root[data-theme="dark"] {
+    --bg: #11161b; --panel: #182028; --ink: #e8eef3; --muted: #a2b0bc; --line: #2a343e; --track: #26303a;
+    --accent: #5fd39a; --accent-bg: #133024; --blue: #8ab4ff; --blue-bg: #17243a;
+    --amber: #f0c060; --amber-bg: #2f2512; --red: #ff8a80; --red-bg: #361a19;
+    --violet: #c3b0ff; --violet-bg: #251e3d; --grey-bg: #202a33; --ghost: #ff8a80; --shadow: none; }
+  :root[data-size="large"] { --fs: 19px; }
   * { box-sizing: border-box; }
+  html { font-size: var(--fs); }
   body { margin: 0; background: var(--bg); color: var(--ink);
-         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  header { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; padding: 18px 28px;
-           background: var(--panel); border-bottom: 1px solid var(--line); }
-  .brand { display: flex; flex-direction: column; }
-  .brand b { font-size: 20px; letter-spacing: .2px; }
-  .brand span { color: var(--muted); font-size: 13px; }
-  .clock { font: 600 40px/1 ui-monospace, "SF Mono", Consolas, monospace; font-variant-numeric: tabular-nums; }
-  .clock small { display: block; font: 12px system-ui, sans-serif; color: var(--muted); margin-top: 4px; }
-  .totals { display: flex; gap: 28px; margin-left: auto; }
-  .stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
-  .stat span { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
-  .synthetic { background: var(--amber-bg); color: var(--amber); font-size: 12px; font-weight: 600;
-               padding: 4px 10px; border-radius: 999px; }
-  .conn { font-size: 12px; color: var(--red); display: none; }
-  .conn.show { display: inline; }
-  main { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; padding: 20px 28px 32px; }
-  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } .totals { margin-left: 0; } }
-  .beds { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; align-content: start; }
-  @media (max-width: 520px) { .beds { grid-template-columns: 1fr; } header, main { padding-left: 16px; padding-right: 16px; } }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-          box-shadow: var(--shadow); padding: 16px 18px; border-left: 6px solid var(--line); }
-  .card.s-progress { border-left-color: var(--blue); }
-  .card.s-attention { border-left-color: var(--amber); }
-  .card.s-ready, .card.s-home { border-left-color: var(--green); }
-  .card.s-notfit { opacity: .75; }
-  .top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-  .bed { font-weight: 700; color: var(--muted); font-size: 13px; text-transform: uppercase; letter-spacing: .6px; }
-  .name { font-size: 18px; font-weight: 650; }
-  .meta { color: var(--muted); font-size: 13px; }
-  .pill { margin-left: auto; font-size: 12px; font-weight: 650; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
-  .pill.s-progress { background: var(--blue-bg); color: var(--blue); }
-  .pill.s-attention { background: var(--amber-bg); color: var(--amber); }
-  .pill.s-ready, .pill.s-home { background: var(--green-bg); color: var(--green); }
-  .pill.s-notfit { background: var(--grey-bg); color: var(--muted); }
-  .blocker { margin: 12px 0 10px; font-size: 16px; font-weight: 550; }
-  .card.s-attention .blocker { color: var(--amber); }
-  .card.s-home .blocker, .card.s-ready .blocker { color: var(--green); }
-  .tasks { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-  .task { font-size: 12.5px; padding: 4px 9px; border-radius: 8px; border: 1px solid transparent;
-          background: var(--grey-bg); color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
-  .task .eta { font-variant-numeric: tabular-nums; opacity: .85; }
-  .task.done { background: var(--green-bg); color: var(--green); }
+         font: 1rem/1.5 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 8px; }
+  @media (prefers-reduced-motion: no-preference) { .card, .seg { transition: border-color .3s, box-shadow .3s, width .6s; } }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* header */
+  header { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: center;
+           padding: 20px clamp(16px, 3vw, 36px) 14px; }
+  .title { display: flex; align-items: center; gap: 14px; }
+  .title svg { flex: none; }
+  h1 { margin: 0; font-size: 1.55rem; letter-spacing: -.2px; }
+  .promise { margin: 2px 0 0; color: var(--muted); }
+  .right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
+  .clock { font: 600 2.4rem/1 ui-monospace, "Cascadia Mono", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  .clock small { display: block; font: .72rem "Segoe UI", system-ui, sans-serif; color: var(--muted); text-align: right; }
+  .tag { font-size: .78rem; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: var(--amber-bg); color: var(--amber); }
+  .live { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
+  .live i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .live.off i { background: var(--red); } .live.off { color: var(--red); }
+  .tool { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: .85rem; }
+  .tool[aria-pressed="true"] { background: var(--ink); color: var(--panel); }
+
+  /* today strip */
+  .today { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; padding: 4px clamp(16px, 3vw, 36px) 16px; }
+  .metric { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; box-shadow: var(--shadow); }
+  .metric b { display: block; font-size: 1.6rem; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .metric span { color: var(--muted); font-size: .82rem; }
+  .metric.good b { color: var(--accent); }
+  .metric.human b { color: var(--violet); }
+  @media (max-width: 900px) { .today { grid-template-columns: repeat(2, minmax(0, 1fr)); } header { grid-template-columns: 1fr; } .right { justify-content: flex-start; } }
+
+  /* layout */
+  main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 20px; padding: 0 clamp(16px, 3vw, 36px) 24px; }
+  @media (max-width: 1150px) { main { grid-template-columns: 1fr; } }
+  .bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .bar h2 { margin: 0 8px 0 0; font-size: 1.05rem; }
+  .chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 12px; cursor: pointer; font-size: .85rem; }
+  .chip[aria-checked="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+  .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 430px), 1fr)); gap: 16px; }
+
+  /* person card */
+  .card { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+          box-shadow: var(--shadow); padding: 16px 18px 14px; cursor: pointer; text-align: left; width: 100%;
+          display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; }
+  .card .who { padding-right: 9.5rem; }
+  .card:hover { border-color: var(--muted); }
+  .card .who { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .card .name { font-size: 1.3rem; font-weight: 700; }
+  .card .bedno { font-size: .78rem; color: var(--muted); font-weight: 650; text-transform: uppercase; letter-spacing: .6px; }
+  .card .about { color: var(--muted); font-size: .9rem; margin-top: 1px; }
+  .status { position: absolute; top: 14px; right: 16px; display: inline-flex; gap: 6px; align-items: center;
+            font-size: .8rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+  .st-home { background: var(--accent-bg); color: var(--accent); }
+  .st-attention { background: var(--amber-bg); color: var(--amber); }
+  .st-progress { background: var(--blue-bg); color: var(--blue); }
+  .st-approval { background: var(--violet-bg); color: var(--violet); }
+  .st-ready { background: var(--accent-bg); color: var(--accent); }
+  .st-notfit { background: var(--grey-bg); color: var(--muted); }
+  .waiting { margin: 12px 0 4px; font-size: 1.08rem; font-weight: 600; }
+  .waiting.attention { color: var(--amber); } .waiting.home { color: var(--accent); }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--muted); font-size: .85rem; margin-top: 8px; }
+  .facts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .saved { margin-top: 10px; padding: 8px 12px; border-radius: 10px; background: var(--accent-bg); color: var(--accent); font-weight: 650; }
+
+  /* the day strip: the memorable bit */
+  .day { margin-top: 12px; }
+  .daytrack { position: relative; height: 34px; }
+  .daytrack .rail { position: absolute; left: 0; right: 0; top: 14px; height: 8px; border-radius: 8px; background: var(--track); }
+  .daytrack .seg { position: absolute; top: 14px; height: 8px; border-radius: 8px; background: var(--blue); }
+  .daytrack .seg.home { background: var(--accent); }
+  .daytrack .seg.attention { background: var(--amber); }
+  .daytrack .tick { position: absolute; top: 11px; width: 3px; height: 14px; border-radius: 2px; background: var(--panel); box-shadow: 0 0 0 1px var(--muted); }
+  .daytrack .nowline { position: absolute; top: 4px; bottom: 2px; width: 2px; background: var(--ink); opacity: .55; }
+  .daytrack .ghost { position: absolute; top: 2px; bottom: 0; border-left: 2px dashed var(--ghost); }
+  .daytrack .ghost span { position: absolute; top: -4px; right: 5px; font-size: .7rem; color: var(--ghost); white-space: nowrap; }
+  .daylabels { display: flex; justify-content: space-between; font: .72rem ui-monospace, Consolas, monospace; color: var(--muted); }
+
+  /* tasks as plain words */
+  .tasks { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .task { font-size: .8rem; padding: 3px 9px; border-radius: 8px; background: var(--grey-bg); color: var(--muted); }
+  .task.done { background: var(--accent-bg); color: var(--accent); }
   .task.in_progress { background: var(--blue-bg); color: var(--blue); }
-  .task.awaiting_approval { background: var(--violet-bg); color: var(--violet); font-weight: 600; }
-  .task.ready { background: var(--panel); border-color: var(--line); color: var(--ink); }
-  .task.pending { border: 1px dashed var(--line); background: transparent; }
-  .task.blocked { background: var(--red-bg); color: var(--red); font-weight: 600; }
-  .task.overdue:not(.done) { box-shadow: inset 0 0 0 2px var(--amber); }
-  .task.blocker-task { outline: 2px solid currentColor; outline-offset: 1px; }
-  .foot { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; color: var(--muted); font-size: 13px; }
-  .foot b { color: var(--ink); font-variant-numeric: tabular-nums; }
-  .saved { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .task.awaiting_approval { background: var(--violet-bg); color: var(--violet); font-weight: 650; }
+  .task.blocked { background: var(--red-bg); color: var(--red); font-weight: 650; }
+  .task.ready { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); }
+
+  /* ledger */
   aside { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
-          padding: 16px 18px; align-self: start; position: sticky; top: 16px; }
-  aside h2 { margin: 0 0 4px; font-size: 15px; }
-  aside p.sub { margin: 0 0 12px; color: var(--muted); font-size: 12.5px; }
+          padding: 16px 18px; align-self: start; position: sticky; top: 14px; max-height: calc(100vh - 28px); overflow: auto; }
+  aside h2 { margin: 0; font-size: 1.05rem; }
+  aside .sub { margin: 2px 0 10px; color: var(--muted); font-size: .84rem; }
   .ledger { list-style: none; margin: 0; padding: 0; }
-  .ledger li { padding: 9px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 46px 1fr; gap: 2px 10px; }
-  .ledger time { font: 600 12.5px ui-monospace, Consolas, monospace; color: var(--muted); }
-  .ledger .who { font-size: 13px; font-weight: 600; }
-  .ledger .what { grid-column: 2; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
-  .badge { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 6px; margin-left: 6px; text-transform: uppercase; letter-spacing: .4px; }
-  .badge.human { background: var(--green-bg); color: var(--green); }
-  .badge.agent { background: var(--blue-bg); color: var(--blue); }
-  .badge.system { background: var(--grey-bg); color: var(--muted); }
-  .badge.approval { background: var(--violet-bg); color: var(--violet); }
-  .empty { color: var(--muted); font-size: 13px; }
+  .ledger li { display: grid; grid-template-columns: 3.1rem 1fr; gap: 0 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .ledger time { font: 600 .8rem ui-monospace, Consolas, monospace; color: var(--muted); padding-top: 2px; }
+  .ledger .line { font-size: .9rem; }
+  .ledger .line b { font-weight: 650; }
+  .ledger .why { color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
+  .kind { font-size: .66rem; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; padding: 1px 6px; border-radius: 6px; margin-left: 6px; vertical-align: 1px; }
+  .k-human { background: var(--accent-bg); color: var(--accent); }
+  .k-agent { background: var(--blue-bg); color: var(--blue); }
+  .k-system { background: var(--grey-bg); color: var(--muted); }
+  .k-approval { background: var(--violet-bg); color: var(--violet); }
+
+  /* why this matters */
+  .why-strip { margin: 4px clamp(16px, 3vw, 36px) 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .why-strip section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+  .why-strip h3 { margin: 0 0 6px; font-size: 1rem; }
+  .why-strip p { margin: 0; color: var(--muted); font-size: .9rem; }
+  .why-strip strong { color: var(--ink); }
+  .source { margin: -16px clamp(16px, 3vw, 36px) 24px; color: var(--muted); font-size: .76rem; }
+  @media (max-width: 900px) { .why-strip { grid-template-columns: 1fr; } }
+
+  /* person story dialog */
+  dialog { width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 32px); border: 1px solid var(--line); border-radius: 18px;
+           padding: 0; background: var(--panel); color: var(--ink); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+  dialog::backdrop { background: rgba(10,15,20,.55); }
+  .dlg { padding: 22px 24px; }
+  .dlg header { padding: 0; display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+  .dlg h2 { margin: 0; font-size: 1.5rem; }
+  .dlg h3 { font-size: .95rem; margin: 18px 0 6px; }
+  .dlg pre { white-space: pre-wrap; background: var(--grey-bg); border-radius: 10px; padding: 12px 14px; margin: 0;
+             font: .88rem/1.5 ui-monospace, Consolas, monospace; }
+  .rows { list-style: none; margin: 0; padding: 0; }
+  .rows li { display: grid; grid-template-columns: 1.4rem 1fr auto; gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); font-size: .92rem; }
+  .rows .meta { color: var(--muted); font-size: .82rem; text-align: right; }
+  .icon { font-weight: 800; text-align: center; }
+  .note { color: var(--muted); font-size: .84rem; margin-top: 14px; }
 </style>
 </head>
 <body>
 <header>
-  <div class="brand"><b>Ward 7 · Homeward</b><span>Non-clinical discharge coordination · agents in Switch, humans approve</span></div>
-  <div class="clock" id="clock">--:--<small>scenario clock</small></div>
-  <span class="synthetic">Synthetic data · training ward</span>
-  <span class="conn" id="conn">Board offline: is the sim running?</span>
-  <div class="totals">
-    <div class="stat"><b id="t-hours">0.0</b><span>bed-hours since fit</span></div>
-    <div class="stat"><b id="t-gbp">£0</b><span>cost of delay (£23.42/h)</span></div>
-    <div class="stat"><b id="t-approvals">0</b><span>human approvals</span></div>
+  <div class="title">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="var(--accent)"/>
+      <path d="M9 21 L20 11 L31 21 M13 18 V30 H27 V18 M18 30 V24 H22 V30" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <div>
+      <h1>Ward 7 · Homeward</h1>
+      <p class="promise">Getting people home on the day they're ready. Agents chase; nurses decide; doctors keep every clinical call.</p>
+    </div>
+  </div>
+  <div class="right">
+    <span class="tag">Synthetic training ward · no real patients</span>
+    <span class="live" id="live" role="status"><i aria-hidden="true"></i><span>Live</span></span>
+    <button class="tool" id="size" aria-pressed="false" title="Larger text for projectors">A+ Larger text</button>
+    <button class="tool" id="theme" aria-label="Switch light or dark theme">◐ Theme</button>
+    <div class="clock" aria-live="off"><span id="clock">--:--</span><small>ward clock (scenario)</small></div>
   </div>
 </header>
+
+<section class="today" aria-label="Today on Ward 7">
+  <div class="metric"><b id="m-waiting">0</b><span>people fit to leave, still here</span></div>
+  <div class="metric good"><b id="m-home">0</b><span>people home today</span></div>
+  <div class="metric"><b id="m-hours">0</b><span>hours people have waited since fit</span></div>
+  <div class="metric good"><b id="m-freed">0</b><span>hours handed back vs. a usual day</span></div>
+  <div class="metric human"><b id="m-human">0 · 0</b><span>nurse approvals · clinical calls by agents</span></div>
+</section>
+
 <main>
-  <section class="beds" id="beds" aria-live="polite"></section>
-  <aside>
-    <h2>Approval &amp; action ledger</h2>
-    <p class="sub">Every change, who made it, and who approved it.</p>
-    <ul class="ledger" id="ledger"></ul>
+  <section aria-labelledby="people-h">
+    <div class="bar">
+      <h2 id="people-h">People on the ward</h2>
+      <div role="radiogroup" aria-label="Show" id="filters">
+        <button class="chip" role="radio" aria-checked="true" data-f="all">Everyone</button>
+        <button class="chip" role="radio" aria-checked="false" data-f="attention">Needs attention</button>
+        <button class="chip" role="radio" aria-checked="false" data-f="home">Gone home</button>
+      </div>
+    </div>
+    <div class="people" id="people" aria-live="polite"></div>
+    <p class="note">Select a person to open their day: timeline, what's left, and who did what. Approvals happen in Slack, on the Switch approval card, not here.</p>
+  </section>
+  <aside aria-labelledby="ledger-h">
+    <h2 id="ledger-h">Who did what</h2>
+    <p class="sub">Every change, in plain words. <span class="kind k-human">human</span><span class="kind k-agent">agent</span><span class="kind k-system">hospital system</span></p>
+    <ol class="ledger" id="ledger" reversed></ol>
   </aside>
 </main>
+
+<div class="why-strip" aria-label="Why this matters">
+  <section><h3>For people like Margaret</h3><p>About <strong>13,000 people a day</strong> in England are well enough to leave hospital but are still in a bed, around <strong>1 in 10 beds</strong>. For an 82-year-old, an afternoon in a ward is not a neutral wait.</p></section>
+  <section><h3>For families like Sarah's</h3><p>They wait for a time nobody can give. Homeward keeps one honest answer for each person: <strong>what they're waiting on, who owns it, and when</strong>.</p></section>
+  <section><h3>For the nurses</h3><p>The chasing moves to agents. Every outward action still needs <strong>a nurse's yes</strong>, and agents refuse clinical work: fitness, medicines and letters stay with clinicians.</p></section>
+</div>
+<p class="source">Figures: NHS England delayed-discharge statistics as summarised in the project's research dossier (£562 per bed-day). Everyone on this board is invented.</p>
+
+<dialog id="story" aria-labelledby="story-name">
+  <div class="dlg">
+    <header>
+      <div><h2 id="story-name"></h2><div class="about" id="story-about"></div></div>
+      <button class="tool" id="story-close" aria-label="Close">Close ✕</button>
+    </header>
+    <p class="waiting" id="story-waiting"></p>
+    <div class="day" id="story-day"></div>
+    <h3>What has to happen before they go</h3>
+    <ul class="rows" id="story-tasks"></ul>
+    <h3>Shift handover <button class="tool" id="copy" style="margin-left:8px">Copy</button></h3>
+    <pre id="story-handover"></pre>
+    <h3>Who did what for them</h3>
+    <ol class="ledger" id="story-ledger"></ol>
+  </div>
+</dialog>
+
 <script>
 "use strict";
-const POLL_MS = 2000;
-const STATUS_LABEL = { pending: "waiting", ready: "to do", in_progress: "in progress",
-  awaiting_approval: "awaiting approval", done: "done", blocked: "blocked", cancelled: "cancelled" };
+const POLL_MS = 2000, DAY_START = 8, DAY_END = 20;
+const PATHWAY = { P0: "going home, no new support", P1: "going home with support", P2: "going to a rehab bed", P3: "going to a care home" };
+const MOBILITY = { independent: "walks independently", wheelchair: "uses a wheelchair", stretcher: "needs a stretcher" };
+const STATUS_WORD = { pending: "waiting on another step", ready: "to do", in_progress: "under way", awaiting_approval: "waiting for a nurse's approval",
+                      done: "done", blocked: "blocked", cancelled: "cancelled" };
+const ICON = { pending: "…", ready: "○", in_progress: "◔", awaiting_approval: "?", done: "✓", blocked: "!", cancelled: "×" };
+const PEOPLE = { "nurse-amy": "Nurse Amy", "dr-raj": "Dr Raj", "dr-on-call": "On-call doctor", "pharmacy-system": "Pharmacy",
+                 "transport-system": "Transport provider", "ambulance-crew": "Ambulance crew", "engine": "Homeward timer",
+                 "sw-ola": "Social worker Ola", "sim": "Hospital system" };
+let state = { data: null, filter: "all", open: null };
 
-function el(tag, cls, text) {
-  const n = document.createElement(tag);
-  if (cls) n.className = cls;
-  if (text !== undefined && text !== null) n.textContent = text;   // always text, never HTML
-  return n;
+const $ = id => document.getElementById(id);
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+const hhmm = iso => iso ? iso.slice(11, 16) : "";
+const hours = iso => { const d = new Date(iso); return d.getUTCHours() + d.getUTCMinutes() / 60; };
+const pct = h => Math.max(0, Math.min(100, (h - DAY_START) / (DAY_END - DAY_START) * 100));
+const gbp = x => "£" + Math.round(x).toLocaleString("en-GB");
+const first = name => name.split(" ")[0];
+function who(actor) {
+  const name = PEOPLE[actor.id] || actor.id;
+  return actor.type === "agent" ? actor.id : name;
 }
-function hhmm(iso) { return iso ? iso.slice(11, 16) : ""; }
-function gbp(x) { return "£" + Math.round(x).toLocaleString("en-GB"); }
 
-function bedState(b) {
-  if (!b.declared_fit) return ["notfit", "Not yet fit"];
-  if (b.departed_at) return ["home", "Gone home " + hhmm(b.departed_at)];
-  const tasks = b.tasks || [];
-  if (tasks.some(t => t.status === "blocked") || (b.overdue || []).length) return ["attention", "Needs attention"];
-  if (tasks.every(t => t.status === "done" || t.status === "cancelled")) return ["ready", "Ready to go"];
-  if (tasks.some(t => t.status === "awaiting_approval")) return ["progress", "Awaiting approval"];
-  return ["progress", "In progress"];
+function personState(p) {
+  if (!p.declared_fit) return { key: "notfit", word: "Not yet fit to leave", icon: "·" };
+  if (p.departed_at) return { key: "home", word: "Home " + hhmm(p.departed_at), icon: "✓" };
+  const t = p.tasks || [];
+  if (t.some(x => x.status === "blocked") || (p.overdue || []).length) return { key: "attention", word: "Needs attention", icon: "!" };
+  if (t.every(x => x.status === "done" || x.status === "cancelled")) return { key: "ready", word: "Ready to go", icon: "✓" };
+  if (t.some(x => x.status === "awaiting_approval")) return { key: "approval", word: "Waiting for a nurse", icon: "?" };
+  return { key: "progress", word: "On the way home", icon: "→" };
+}
+function about(p) {
+  const bits = [p.age, MOBILITY[p.mobility] || p.mobility];
+  if (p.pathway) bits.push(PATHWAY[p.pathway] || p.pathway);
+  return bits.join(" · ");
 }
 
-function renderBed(b) {
-  const [state, label] = bedState(b);
-  const card = el("article", "card s-" + state);
-  const top = el("div", "top");
-  top.append(el("span", "bed", "Bed " + b.bed), el("span", "name", b.name),
-             el("span", "meta", b.age + " · " + b.mobility + (b.pathway ? " · " + b.pathway : "")),
-             el("span", "pill s-" + state, label));
-  card.append(top);
-  if (!b.declared_fit) {
-    card.append(el("p", "blocker", "Awaiting a doctor's medically-fit decision (EPR)."));
-    return card;
+function dayStrip(p, nowIso, big) {
+  const wrap = el("div", "day");
+  const track = el("div", "daytrack");
+  track.setAttribute("role", "img");
+  const start = hours(p.fit_at), end = p.departed_at ? hours(p.departed_at) : hours(nowIso);
+  const st = personState(p).key;
+  track.append(el("div", "rail"));
+  const seg = el("div", "seg " + (st === "home" ? "home" : st === "attention" ? "attention" : ""));
+  seg.style.left = pct(start) + "%"; seg.style.width = Math.max(0.6, pct(end) - pct(start)) + "%";
+  track.append(seg);
+  for (const t of p.tasks || []) if (t.status === "done" && t.eta) {
+    const tick = el("div", "tick"); tick.style.left = "calc(" + pct(hours(t.eta)) + "% - 1px)"; tick.title = t.label + " ✓ " + hhmm(t.eta); track.append(tick);
   }
-  card.append(el("p", "blocker", b.blocker));
+  if (!p.departed_at) { const n = el("div", "nowline"); n.style.left = pct(hours(nowIso)) + "%"; track.append(n); }
+  let label = first(p.name) + " has been fit since " + hhmm(p.fit_at) + (p.departed_at ? " and went home at " + hhmm(p.departed_at) : ", still on the ward at " + hhmm(nowIso));
+  if (p.baseline_departure) {
+    const g = el("div", "ghost"); g.style.left = pct(hours(p.baseline_departure)) + "%";
+    g.append(el("span", null, "usual day: " + hhmm(p.baseline_departure))); track.append(g);
+    label += "; on a usual day " + first(p.name) + " would have left at " + hhmm(p.baseline_departure);
+  }
+  track.setAttribute("aria-label", label + ".");
+  const labels = el("div", "daylabels");
+  for (const h of big ? [8, 10, 12, 14, 16, 18, 20] : [8, 12, 16, 20]) labels.append(el("span", null, String(h).padStart(2, "0") + ":00"));
+  wrap.append(track, labels);
+  return wrap;
+}
+
+function personCard(p, nowIso) {
+  const s = personState(p);
+  const card = el("button", "card");
+  card.type = "button";
+  card.dataset.bed = p.bed;
+  card.setAttribute("aria-label", p.name + ", bed " + p.bed + ". " + s.word + ". Open their day.");
+  const status = el("span", "status st-" + s.key); status.append(el("span", null, s.icon), el("span", null, s.word));
+  const w = el("div", "who"); w.append(el("span", "name", p.name), el("span", "bedno", "Bed " + p.bed));
+  card.append(status, w, el("div", "about", about(p)));
+  if (!p.declared_fit) { card.append(el("p", "waiting", "Waiting for a doctor to decide they're medically fit.")); return card; }
+  card.append(el("p", "waiting " + (s.key === "attention" ? "attention" : s.key === "home" ? "home" : ""), p.blocker));
+  card.append(dayStrip(p, nowIso, false));
   const ul = el("ul", "tasks");
-  for (const t of b.tasks) {
-    const overdue = (b.overdue || []).includes(t.id);
-    const li = el("li", "task " + t.status + (overdue ? " overdue" : "") + (t.id === b.blocker_task ? " blocker-task" : ""));
-    li.title = t.label + " · owner " + t.owner_role + " · " + (STATUS_LABEL[t.status] || t.status) + (t.human_only ? " · clinical, human only" : "");
-    li.append(el("span", null, (t.human_only ? "🔒 " : "") + t.label));
-    const eta = t.status === "done" ? "✓ " + hhmm(t.eta) : (t.eta ? hhmm(t.eta) : "");
-    if (eta) li.append(el("span", "eta", eta));
+  for (const t of p.tasks) {
+    const li = el("li", "task " + t.status, (t.human_only ? "🔒 " : "") + t.label + (t.status === "done" ? " ✓" : ""));
+    li.title = t.label + ": " + (STATUS_WORD[t.status] || t.status) + " · owner " + t.owner_role.replace("_", " ") + (t.human_only ? " · clinical: a human only" : "");
     ul.append(li);
   }
   card.append(ul);
-  const foot = el("div", "foot");
-  const fit = el("span", null, "Fit since "); fit.append(el("b", null, hhmm(b.fit_at))); foot.append(fit);
-  const cost = el("span", null, "Bed-hours "); cost.append(el("b", null, b.cost.hours.toFixed(2) + " · " + gbp(b.cost.gbp))); foot.append(cost);
-  const live = (b.bookings || []).filter(x => x.status === "confirmed" || x.status === "pending_approval");
-  if (live.length) {
-    const bk = live[live.length - 1];
-    const s = el("span", null, "Transport "); s.append(el("b", null, bk.vehicle + " " + hhmm(bk.slot) + (bk.status === "confirmed" ? " ✓ " + (bk.approved_by || "") : " (awaiting approval)")));
-    foot.append(s);
+  const f = el("div", "facts");
+  const add = (k, v) => { const s = el("span", null, k + " "); s.append(el("b", null, v)); f.append(s); };
+  add("Fit since", hhmm(p.fit_at));
+  add("Waited", p.cost.hours.toFixed(1) + " h · " + gbp(p.cost.gbp));
+  const live = (p.bookings || []).filter(b => b.status === "confirmed" || b.status === "pending_approval").pop();
+  if (live) add("Transport", live.vehicle + " " + hhmm(live.slot) + (live.status === "confirmed" ? " ✓ " + (PEOPLE[live.approved_by] || live.approved_by) : " (waiting for a nurse)"));
+  card.append(f);
+  if (p.departed_at && p.baseline_departure) {
+    const saved = (Date.parse(p.baseline_departure) - Date.parse(p.departed_at)) / 3600000;
+    if (saved > 0) card.append(el("div", "saved", first(p.name) + " was home at " + hhmm(p.departed_at) + ", not " + hhmm(p.baseline_departure) + ": " + saved.toFixed(1) + " hours of " + first(p.name) + "'s day back"));
   }
-  card.append(foot);
-  if (b.departed_at && b.baseline_departure) {
-    const saved = (Date.parse(b.baseline_departure) - Date.parse(b.departed_at)) / 3600000;
-    if (saved > 0) card.append(el("div", "saved",
-      "Left " + hhmm(b.departed_at) + " instead of " + hhmm(b.baseline_departure) + " · " +
-      saved.toFixed(1) + " bed-hours freed (" + gbp(saved * 23.42) + ")"));
-  }
+  card.addEventListener("click", () => openStory(p.bed));
   return card;
 }
 
-function renderLedger(rows) {
-  const ul = document.getElementById("ledger");
-  ul.replaceChildren();
-  if (!rows.length) { ul.append(el("li", "empty", "No activity yet.")); return; }
-  for (const r of rows.slice().reverse()) {
-    const li = el("li");
-    li.append(el("time", null, hhmm(r.at)));
-    const who = el("div", "who", r.actor.id);
-    who.append(el("span", "badge " + r.actor.type, r.actor.type));
-    if (r.approval_id && r.actor.type === "human") who.append(el("span", "badge approval", "approved " + r.approval_id));
-    li.append(who);
-    li.append(el("div", "what", "Bed " + r.bed + " · " + r.action.replace("task.", "task → ") +
-                 (r.task_id ? " " + r.task_id : "") + (r.detail ? " · " + r.detail : "")));
-    ul.append(li);
-  }
+function ledgerLine(r, names) {
+  const li = el("li");
+  li.append(el("time", null, hhmm(r.at)));
+  const box = el("div");
+  const line = el("div", "line");
+  const name = names[r.bed] ? first(names[r.bed]) : "bed " + r.bed;
+  const label = r.task_label || (r.task_id ? r.task_id : "");
+  const actor = el("b", null, who(r.actor));
+  let text;
+  if (r.action === "patient.mffd") text = " declared " + name + " medically fit";
+  else if (r.action === "patient.departed") text = ": " + name + " went home";
+  else if (r.action === "nudge") text = " nudged the owner";
+  else if (r.action === "escalation") text = " escalated to the bed manager";
+  else if (r.action === "task.in_progress" && r.approval_id && r.actor.type === "human") text = " approved " + label + " for " + name;
+  else if (r.action === "task.awaiting_approval") text = " asked a nurse to approve " + label + " for " + name;
+  else if (r.action === "task.done") text = ": " + label + " done for " + name;
+  else if (r.action === "task.blocked") text = ": " + label + " blocked for " + name;
+  else if (r.action === "task.ready") text = ": " + label + " ready for " + name;
+  else if (r.action === "task.in_progress") text = ": " + label + " under way for " + name;
+  else text = " · " + r.action + " · " + name;
+  line.append(actor, el("span", "kind k-" + r.actor.type, r.actor.type === "system" ? "hospital system" : r.actor.type));
+  if (r.approval_id && r.actor.type === "human") line.append(el("span", "kind k-approval", "approval " + r.approval_id));
+  line.append(document.createTextNode(text));
+  box.append(line);
+  if (r.detail) box.append(el("div", "why", r.detail));
+  li.append(box);
+  return li;
 }
+
+function labelRows(rows, data) {
+  const labels = {};
+  for (const b of data.beds) for (const t of b.tasks || []) labels[b.bed + ":" + t.id] = t.label;
+  return rows.map(r => ({ ...r, task_label: r.task_id ? labels[r.bed + ":" + r.task_id] : null }));
+}
+
+function render() {
+  const d = state.data; if (!d) return;
+  $("clock").textContent = hhmm(d.now);
+  const t = d.totals;
+  $("m-waiting").textContent = t.ready;
+  $("m-home").textContent = t.home;
+  $("m-hours").textContent = t.bed_hours.toFixed(1);
+  $("m-freed").textContent = t.hours_freed.toFixed(1);
+  $("m-human").textContent = t.approvals + " · " + t.clinical_by_agents;
+  const shown = d.beds.filter(p => {
+    const k = personState(p).key;
+    return state.filter === "all" || (state.filter === "attention" && k === "attention") || (state.filter === "home" && k === "home");
+  });
+  const focusBed = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.bed : null;
+  $("people").replaceChildren(...(shown.length ? shown.map(p => personCard(p, d.now)) : [el("p", "note", "Nobody in this view right now.")]));
+  if (focusBed) { const again = document.querySelector('.card[data-bed="' + focusBed + '"]'); if (again) again.focus(); }
+  const names = Object.fromEntries(d.beds.map(b => [b.bed, b.name]));
+  const rows = labelRows(d.ledger, d).slice().reverse();
+  $("ledger").replaceChildren(...(rows.length ? rows.map(r => ledgerLine(r, names)) : [el("li", "note", "Nothing has happened yet.")]));
+  if (state.open) renderStory();
+}
+
+async function renderStory() {
+  const d = state.data, p = d.beds.find(b => b.bed === state.open); if (!p) return;
+  const s = personState(p);
+  $("story-name").textContent = p.name + " · bed " + p.bed;
+  $("story-about").textContent = about(p) + " · " + s.word;
+  $("story-waiting").textContent = p.declared_fit ? p.blocker : "Waiting for a doctor to decide they're medically fit.";
+  $("story-day").replaceChildren(...(p.declared_fit ? [dayStrip(p, d.now, true)] : []));
+  $("story-tasks").replaceChildren(...(p.tasks || []).map(t => {
+    const li = el("li");
+    li.append(el("span", "icon", ICON[t.status] || ""), el("span", null, (t.human_only ? "🔒 " : "") + t.label + ": " + (STATUS_WORD[t.status] || t.status) +
+      (t.human_only ? " (clinical: only a " + t.owner_role + ")" : "")), el("span", "meta", t.owner_role.replace("_", " ") + (t.eta ? " · " + hhmm(t.eta) : "")));
+    return li;
+  }));
+  if (!p.declared_fit) { $("story-handover").textContent = "Nothing to hand over yet."; $("story-ledger").replaceChildren(); return; }
+  try {
+    const [h, l] = await Promise.all([fetch("/patients/" + p.bed + "/handover").then(r => r.text()), fetch("/patients/" + p.bed + "/ledger").then(r => r.json())]);
+    $("story-handover").textContent = h;
+    const names = { [p.bed]: p.name };
+    $("story-ledger").replaceChildren(...labelRows(l, d).reverse().map(r => ledgerLine(r, names)));
+  } catch (e) { /* keep last good view */ }
+}
+
+function openStory(bed) { state.open = bed; renderStory(); const dlg = $("story"); if (!dlg.open) dlg.showModal(); }
+$("story-close").addEventListener("click", () => $("story").close());
+$("story").addEventListener("close", () => { const bed = state.open; state.open = null; const c = document.querySelector('.card[data-bed="' + bed + '"]'); if (c) c.focus(); });
+$("copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("story-handover").textContent); $("copy").textContent = "Copied ✓"; }
+  catch (e) { $("copy").textContent = "Select and copy"; }
+  setTimeout(() => { $("copy").textContent = "Copy"; }, 1600);
+});
+$("filters").addEventListener("click", e => {
+  const b = e.target.closest("[data-f]"); if (!b) return;
+  state.filter = b.dataset.f;
+  for (const c of $("filters").children) c.setAttribute("aria-checked", String(c === b));
+  render();
+});
+$("filters").addEventListener("keydown", e => {
+  if (!["ArrowLeft", "ArrowRight"].includes(e.key)) return;
+  const items = [...$("filters").children], i = items.indexOf(document.activeElement);
+  const n = items[(i + (e.key === "ArrowRight" ? 1 : items.length - 1)) % items.length]; n.focus(); n.click();
+});
+function pref(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+function applyPrefs() {
+  const size = pref("hw-size") === "large", theme = pref("hw-theme");
+  document.documentElement.dataset.size = size ? "large" : "";
+  $("size").setAttribute("aria-pressed", String(size));
+  if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
+}
+$("size").addEventListener("click", () => { pref("hw-size", pref("hw-size") === "large" ? "normal" : "large"); applyPrefs(); });
+$("theme").addEventListener("click", () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  pref("hw-theme", dark ? "light" : "dark"); applyPrefs();
+});
+applyPrefs();
 
 async function tick() {
   try {
-    const res = await fetch("/board/ward", { cache: "no-store" });
-    if (!res.ok) throw new Error(res.status);
-    const d = await res.json();
-    document.getElementById("conn").classList.remove("show");
-    document.getElementById("clock").firstChild.nodeValue = hhmm(d.now);
-    document.getElementById("t-hours").textContent = d.totals.bed_hours.toFixed(1);
-    document.getElementById("t-gbp").textContent = gbp(d.totals.gbp);
-    document.getElementById("beds").replaceChildren(...d.beds.map(renderBed));
-    renderLedger(d.ledger);
-    document.getElementById("t-approvals").textContent = (d.totals.approvals ?? 0);
+    const r = await fetch("/board/ward", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    state.data = await r.json();
+    $("live").classList.remove("off"); $("live").lastChild.textContent = "Live";
+    render();
   } catch (e) {
-    document.getElementById("conn").classList.add("show");
+    $("live").classList.add("off"); $("live").lastChild.textContent = "Offline: is the sim running?";
   }
 }
-tick();
-setInterval(tick, POLL_MS);
+tick(); setInterval(tick, POLL_MS);
 </script>
 </body>
 </html>
