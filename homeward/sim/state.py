@@ -39,6 +39,7 @@ class Inpatient:
     oxygen: bool = False
     escort: bool = False
     next_of_kin: str = ""
+    baseline_departure: Optional[datetime] = None   # when this patient left without Homeward (story baseline)
 
 
 @dataclass
@@ -80,6 +81,7 @@ class Store:
     def __init__(self, now: datetime):
         self.lock = threading.RLock()
         self.clock = now
+        self.created_at = now   # approvals counted from here (seeded history included)
         self.inpatients: dict[int, Inpatient] = {}
         self.plans: dict[int, Patient] = {}
         self.tto: dict[int, Tto] = {}
@@ -366,7 +368,8 @@ class Store:
     def patient_view(self, bed: int) -> dict:
         ip = self.inpatient(bed)
         out = {"bed": bed, "name": ip.name, "age": ip.age, "mobility": ip.mobility,
-               "declared_fit": bed in self.plans}
+               "declared_fit": bed in self.plans,
+               "baseline_departure": ip.baseline_departure.isoformat() if ip.baseline_departure else None}
         if bed in self.plans:
             p = self.plans[bed]
             out.update(pathway=p.pathway.value, fit_at=p.fit_at.isoformat(),
@@ -406,11 +409,15 @@ class Store:
             row = self.patient_view(bed)
             if bed in self.plans:
                 p = self.plans[bed]
-                row.update(blocker=e.blocker(p, self.clock).summary, cost=e.cost(p, self.clock),
+                tr = e.blocker(p, self.clock)
+                row.update(blocker=tr.summary, blocker_task=tr.task_id, cost=e.cost(p, self.clock),
                            overdue=e.overdue(p, self.clock), tasks=self.plan_view(bed)["tasks"],
                            bookings=[to_wire(b) for b in self.bookings.values() if b.bed == bed])
             beds.append(row)
         lost = sum(e.cost(p, self.clock)["hours"] for p in self.plans.values())
+        approvals = sum(1 for x in self.ledger
+                        if x.approval_id and x.actor.type == ActorType.HUMAN and x.at >= self.created_at)
         return {"now": self.clock.isoformat(), "beds": beds,
-                "totals": {"bed_hours": round(lost, 2), "gbp": round(lost * e.BED_HOUR_GBP, 2)},
+                "totals": {"bed_hours": round(lost, 2), "gbp": round(lost * e.BED_HOUR_GBP, 2),
+                           "approvals": approvals},
                 "ledger": self.ledger_view(limit=12)}

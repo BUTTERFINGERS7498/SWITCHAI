@@ -31,7 +31,8 @@ def ward7() -> Store:
     s = Store(at(8, 0))
     s.add_inpatient(Inpatient(3, "Arthur Bell", 77, "independent", next_of_kin="daughter"))
     s.add_inpatient(Inpatient(7, "Doris Patel", 88, "wheelchair", escort=True, next_of_kin="son"))
-    s.add_inpatient(Inpatient(12, "Margaret Jones", 82, "wheelchair", next_of_kin="daughter Sarah"))
+    s.add_inpatient(Inpatient(12, "Margaret Jones", 82, "wheelchair", next_of_kin="daughter Sarah",
+                              baseline_departure=BASELINE_DEPARTURE))
     s.add_inpatient(Inpatient(15, "Tom Hughes", 64, "independent", next_of_kin="wife"))
 
     # Doris (bed 7, P3 care home): fit 08:00, everything moving except the care-home bed.

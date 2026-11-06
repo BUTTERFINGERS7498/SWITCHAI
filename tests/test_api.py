@@ -297,3 +297,13 @@ def test_booking_with_agent_as_approver_is_rolled_back(api):
                  json={"slot": t("12:15"), "actor": TRANSPORT, "approver": TRANSPORT}), 409, "APPROVAL_REQUIRED")
     assert task(api, 12, "transport_booked")["status"] == "ready"
     assert t("12:15") in api.get("/transport/slots", params={"vehicle": "wheelchair"}).json()["slots"]
+
+
+def test_board_page_and_totals(api):
+    r = api.get("/board")
+    assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+    assert "Ward 7 · Homeward" in r.text and "textContent" in r.text and "innerHTML" not in r.text
+    d = api.get("/board/ward").json()
+    assert d["totals"]["approvals"] == 1  # Arthur's seeded booking, approved by nurse-amy
+    m = next(b for b in d["beds"] if b["bed"] == 12)
+    assert m["baseline_departure"] == t("19:10")

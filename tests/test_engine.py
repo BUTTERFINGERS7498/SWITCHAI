@@ -306,3 +306,19 @@ def test_handover_summary_contents():
     assert "discharge letter signature: ready, owner doctor" in text and "[clinical, human only]" in text
     assert "Next deadline: transport booking by 10:30." in text
     assert "Done: 0/9 tasks." in text
+
+
+def test_transport_target_met_once_approved():
+    p = margaret()
+    tr = tid(p, c.TaskKind.TRANSPORT_BOOKED)
+    e.apply_transition(p, tr, S.AWAITING_APPROVAL, AGENT_TRANSPORT, at(10), approval_id="A-1")
+    e.apply_transition(p, tr, S.IN_PROGRESS, NURSE, at(12), approval_id="A-1", eta=at(135))
+    assert tr not in e.overdue(p, at(200))
+    assert [x for x in e.tick(p, at(200)) if x.task_id == tr] == []
+
+
+def test_tto_clock_keeps_running_while_in_progress():
+    p = margaret()
+    v = tid(p, c.TaskKind.TTO_VERIFY)
+    e.apply_transition(p, v, S.IN_PROGRESS, PHARMACIST, at(5), eta=at(45))
+    assert v in e.overdue(p, at(60))

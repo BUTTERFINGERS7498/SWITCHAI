@@ -31,3 +31,5 @@
 | D27 | Booking accepts `approver`: request + nurse confirm in one call (rolled back if approver isn't a human nurse) | One approval card per decision instead of two | P4 |
 | D28 | Agents: `discharge-lead` (`@lead`, exclusive), `pharmacy-liaison` (`@meds`), `transport-liaison` (`@transport`); Console instructions point to `switch/roles/*.md` | Role behaviour is versioned in the repo; one human (nurse-amy) approves | P4 |
 | D29 | CLI encodes `+` in query strings | Timezone offsets in `after=` were turning into spaces | P4 |
+| D30 | Board = one static page `homeward/sim/static/board.html` (vanilla JS, polls `/board/ward` every 2 s, text-only rendering of ledger); shows baseline-vs-actual departure | No build step; agent-written text can't inject HTML | P5 |
+| D31 | `TARGET_MET_AT`: transport's 30-min target is met when the booking is approved (IN_PROGRESS); TTO clocks keep running while in progress | Arthur showed 'Needs attention' with a confirmed car | P5 |

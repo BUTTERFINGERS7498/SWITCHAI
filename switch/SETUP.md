@@ -17,7 +17,9 @@ Create two channels and turn each into a Switch room:
 ```
 
 ## 2. Agents (Switch Console → Your Agents → + card)
-Same settings for all three: **Run location** This computer · **Directory** the `repo` folder · **Agent provider**
+Same settings for all three: **Run location** This computer · **Directory** the `repo` folder (**required**: the
+default is an empty folder under `~/.switch/agents/`, where the agent can't see `homeward.py`, the role files or
+`.claude/settings.json`, so no approval cards; it can't be changed later) · **Agent provider**
 Claude Code · **Auto mode** on · **Bypass permissions** off · **Who can talk to your agent** Me and my agents (default).
 
 | Name | Description | Agent instructions |

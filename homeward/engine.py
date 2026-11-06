@@ -14,7 +14,7 @@ from typing import Optional
 
 from homeward.contracts import (
     BED_HOUR_GBP, DEPENDS_ON, NUDGES_BEFORE_ESCALATION, OWNER_ROLE, PATHWAY_TASKS,
-    PICKUP_BUFFER_MIN, TARGET_MINUTES, Actor, ActorType, Blocker, ErrorCode, HomewardError,
+    PICKUP_BUFFER_MIN, TARGET_MET_AT, TARGET_MINUTES, Actor, ActorType, Blocker, ErrorCode, HomewardError,
     LedgerEntry, Pathway, Patient, Role, Task, TaskKind, TaskStatus, can_transition, is_human_only,
 )
 
@@ -171,6 +171,13 @@ def blocker(p: Patient, now: datetime) -> Blocker:
     return Blocker(p.bed, t.id, summary, t.owner_role, t.eta)
 
 
+def _clock_running(t: Task) -> bool:
+    """Is this task's target clock running? Not before it is ready, and not once its target is met."""
+    if t.status not in TIMED or not t.target_minutes or t.ready_at is None:
+        return False
+    return TARGET_MET_AT.get(t.kind) != t.status
+
+
 def tick(p: Patient, now: datetime) -> list[LedgerEntry]:
     """Apply due nudges and escalations. Idempotent for a given `now`.
     Thresholds from when the task became ready: nudge at target, nudge at 1.5x, escalate to
@@ -179,7 +186,7 @@ def tick(p: Patient, now: datetime) -> list[LedgerEntry]:
     if p.departed_at:
         return entries
     for t in p.tasks:
-        if t.status not in TIMED or not t.target_minutes or t.ready_at is None:
+        if not _clock_running(t):
             continue
         elapsed = (now - t.ready_at).total_seconds() / 60
         thresholds = [t.target_minutes * f for f in (1.0, 1.5)][:NUDGES_BEFORE_ESCALATION] + [t.target_minutes * 2.0]
@@ -199,8 +206,7 @@ def tick(p: Patient, now: datetime) -> list[LedgerEntry]:
 def overdue(p: Patient, now: datetime) -> list[str]:
     """Ids of timed tasks past their target (for the board's amber state)."""
     return [t.id for t in p.tasks
-            if t.status in TIMED and t.target_minutes and t.ready_at
-            and (now - t.ready_at) >= timedelta(minutes=t.target_minutes)]
+            if _clock_running(t) and (now - t.ready_at) >= timedelta(minutes=t.target_minutes)]
 
 
 def cost(p: Patient, now: datetime) -> dict:
@@ -241,7 +247,7 @@ def handover_summary(p: Patient, now: datetime) -> str:
             lines.append(f"- {TASK_LABEL[t.kind]}: {t.status.value}, owner {t.owner_role.value}, "
                          f"ETA {_hhmm(t.eta)}{flag}")
     deadlines = [(t.ready_at + timedelta(minutes=t.target_minutes), t) for t in open_tasks
-                 if t.target_minutes and t.ready_at and t.status in TIMED]
+                 if _clock_running(t)]
     if deadlines:
         when, t = min(deadlines, key=lambda x: x[0])
         lines.append(f"Next deadline: {TASK_LABEL[t.kind]} by {_hhmm(when)}.")

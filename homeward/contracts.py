@@ -130,6 +130,12 @@ TARGET_MINUTES: dict[TaskKind, Optional[int]] = {
     TaskKind.TRANSPORT_BOOKED: 30,
 }
 
+# A target is met when the task reaches this status (default: DONE). Transport's target is
+# "booking confirmed within 30 min"; after approval it is IN_PROGRESS (awaiting pickup) and on time.
+TARGET_MET_AT: dict[TaskKind, "TaskStatus"] = {
+    TaskKind.TRANSPORT_BOOKED: TaskStatus.IN_PROGRESS,
+}
+
 
 # --- Domain types ------------------------------------------------------------
 @dataclass
