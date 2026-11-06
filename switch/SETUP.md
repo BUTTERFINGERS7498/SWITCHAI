@@ -40,14 +40,28 @@ For `discharge-lead`, update its instructions under its agent settings (or leave
 Switch Console → open `discharge-bed-12` → **Configuration** → **Instructions** → paste the block from
 `switch/room-instructions.md` → **Save**. Do the same for `ward-7`.
 
-## 5. Jobs (roles) and links: ask the lead in `#discharge-bed-12`
+## 5. Jobs (roles) and links (type in `#discharge-bed-12`, one message at a time)
+A job is defined once (name + instructions written *to the agent that takes it*), then taken. An agent receives the
+job's instructions when it takes the job, so define all three first. Each agent holds one job at a time.
+
+Define the jobs:
 ```
-@discharge-lead please set up this room: define an exclusive job "lead" (owns the discharge plan and checklist) and take it;
-define a job "meds" (TTO requests) for pharmacy-liaison and a job "transport" (patient transport) for transport-liaison;
-then link this room to #ward-7 with the label "ward hub", and link #ward-7 back to this room with the label "bed 12".
+@discharge-lead define an exclusive role called lead, with these instructions: you own this patient's non-clinical discharge plan, the checklist room document and the answer to "what's left?". Follow switch/roles/discharge-lead.md and switch/room-instructions.md.
+@discharge-lead define a shared role called meds, with these instructions: send and track the discharge-medicine (TTO) request; never change medicines or set TTO status. Follow switch/roles/pharmacy-liaison.md and switch/room-instructions.md.
+@discharge-lead define a shared role called transport, with these instructions: book transport for when medicines and letter are ready, with a nurse's approval card, and rebook on cancellation. Follow switch/roles/transport-liaison.md and switch/room-instructions.md.
 ```
-Then ask the other two to take their jobs: `@pharmacy-liaison take the meds job` · `@transport-liaison take the transport job`.
-(Alternative: Gateway → room page → **Add role** / **Add linked room**.)
+Fill them:
+```
+@discharge-lead take the lead role
+@pharmacy-liaison take the meds role
+@transport-liaison take the transport role
+```
+Link the rooms (links are one-way, so both directions):
+```
+@discharge-lead link this room to #ward-7 with the label "ward hub", and link #ward-7 back to this room with the label "bed 12"
+```
+Check: `!roles` shows lead → discharge-lead, meds → pharmacy-liaison, transport → transport-liaison.
+Alternative: Gateway → room page → **Add role** / **Add linked room**.
 
 ## 6. Conversation settings (type in `#discharge-bed-12`)
 ```
