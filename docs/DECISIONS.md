@@ -24,3 +24,5 @@
 | D20 | Contract 1.1.0: AWAITING_APPROVAL -> IN_PROGRESS allowed (approved, executing); leaving AWAITING_APPROVAL for IN_PROGRESS/DONE needs a HUMAN | Transport is "booked, awaiting pickup" after approval, so a cancellation can reopen it | P2 |
 | D21 | Hospital systems (pharmacy, crews, EPR letter signing) are simulated on the clock; agents can't set TTO status or complete transport | Agents never impersonate staff | P2 |
 | D22 | Cancelled booking's slot stays taken (vehicle went elsewhere) | Makes the rebook land on 12:30 -> departure 12:40, matching the dossier story | P2 |
+| D23 | CLI paths without leading `/`; CLI undoes Git Bash path rewriting and only accepts known API roots | Found live: Git Bash turned `/health` into `C:/Program Files/Git/health` | P3 |
+| D24 | `.claude/settings.json` committed: allow `read:*`/`test:*`, ask `write:*` | Same approval behaviour for anyone who clones and runs the agents in this folder | P3 |

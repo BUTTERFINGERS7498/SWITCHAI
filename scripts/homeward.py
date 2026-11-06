@@ -7,16 +7,17 @@
   python scripts/homeward.py scenario <name>    run a scripted scenario (P6)
 
 Agent tools (talk to the running sim; base URL from HOMEWARD_URL, default http://127.0.0.1:8765):
-  python scripts/homeward.py read <path>                   GET only, e.g. read /patients/12/blocker
+  python scripts/homeward.py read <path>                   GET only, e.g. read patients/12/blocker
   python scripts/homeward.py write <POST|PATCH> <path> '<json>'   changes state; needs human approval in Switch
-      e.g. write POST /patients/12/tto/request '{"actor":{"id":"pharmacy-liaison","role":"pharmacist","type":"agent"}}'
-      Use '-' as the JSON to read it from stdin.
+      e.g. write POST patients/12/tto/request '{"actor":{"id":"pharmacy-liaison","role":"pharmacist","type":"agent"}}'
+      Use '-' as the JSON to read it from stdin. Write paths without a leading '/' (Git Bash rewrites it).
   Exit codes: 0 ok, 1 rejected by Homeward (error JSON printed), 2 usage, 3 sim not reachable.
 
 `make <cmd>` is a thin wrapper for Mac/Linux.
 """
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.error
@@ -112,27 +113,46 @@ def emit(path: str, status: int, out) -> int:
     return 0 if status < 400 else 1
 
 
-def _check_path(path: str) -> bool:
-    return path.startswith("/") and "://" not in path
+API_ROOTS = ("health", "reset", "clock", "patients", "transport", "board", "events")
+
+
+def normalize_path(arg: str):
+    """Return an API path like /patients/12, or None if invalid.
+    Accepts 'patients/12' or '/patients/12'. Git Bash on Windows rewrites a leading '/' into a
+    Windows path (e.g. 'C:/Program Files/Git/patients/12'); that rewrite is undone here."""
+    if "://" in arg:
+        return None
+    a = arg.replace("\\", "/")
+    if re.match(r"^[A-Za-z]:/", a):
+        m = re.search(r"/(%s)(/|\?|$)" % "|".join(API_ROOTS), a)
+        if not m:
+            return None
+        a = a[m.start():]
+    if not a.startswith("/"):
+        a = "/" + a
+    root = a[1:].split("/", 1)[0].split("?", 1)[0]
+    return a if root in API_ROOTS else None
 
 
 def cmd_read(args):
-    if len(args) != 1 or not _check_path(args[0]):
-        print("usage: homeward.py read <path>   (path starts with /, e.g. /patients/12/blocker)")
+    path = normalize_path(args[0]) if len(args) == 1 else None
+    if not path:
+        print("usage: homeward.py read <path>   e.g. read patients/12/blocker")
         return 2
     try:
-        status, out = http("GET", args[0])
+        status, out = http("GET", path)
     except ConnectionError as ex:
         print(f"Homeward sim not reachable at {base_url()} ({ex}). Start it: python scripts/homeward.py demo")
         return 3
-    return emit(args[0], status, out)
+    return emit(path, status, out)
 
 
 def cmd_write(args):
-    if len(args) not in (2, 3) or args[0].upper() not in WRITE_METHODS or not _check_path(args[1]):
-        print("usage: homeward.py write <POST|PATCH> <path> ['<json>' | -]")
+    path = normalize_path(args[1]) if len(args) in (2, 3) else None
+    if not path or args[0].upper() not in WRITE_METHODS:
+        print("usage: homeward.py write <POST|PATCH> <path> ['<json>' | -]   e.g. write POST patients/12/tto/request '{...}'")
         return 2
-    method, path = args[0].upper(), args[1]
+    method = args[0].upper()
     raw = args[2] if len(args) == 3 else "{}"
     if raw == "-":
         raw = sys.stdin.read()

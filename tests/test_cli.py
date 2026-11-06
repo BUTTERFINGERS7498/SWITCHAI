@@ -96,3 +96,10 @@ def test_usage_errors_exit_2(fresh):
 def test_sim_down_exit_3():
     code, out = run("http://127.0.0.1:9", "read", "/health")
     assert code == 3 and "not reachable" in out
+
+
+def test_paths_without_slash_and_git_bash_rewrite(fresh):
+    assert run(fresh, "read", "health")[0] == 0
+    assert run(fresh, "read", "C:/Program Files/Git/patients/12")[0] == 0
+    assert run(fresh, "read", "C:/Users/x/secrets.txt")[0] == 2   # not an API path
+    assert run(fresh, "read", "etc/passwd")[0] == 2

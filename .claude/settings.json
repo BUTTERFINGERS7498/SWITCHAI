@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python scripts/homeward.py read:*)",
+      "Bash(python scripts/homeward.py test:*)"
+    ],
+    "ask": [
+      "Bash(python scripts/homeward.py write:*)"
+    ]
+  }
+}
