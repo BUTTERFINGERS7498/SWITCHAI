@@ -19,6 +19,12 @@ localhost-only Console links. Bridge hears nothing until `/invite @Agent Switch`
 02:04: `/invite @Agent Switch` in `#homeward-spike` (C0CFNESS0RG) auto-created room `sw_room_0a85dc16…`;
 `/agents-status` answered "no agents in the room". Slack <-> Switch bridge verified.
 
+## Agent boundary observed (03:20 IST)
+Asked to run `homeward.py write POST /patients/12/mffd` with actor `dr-raj`, `discharge-lead` refused: it would record a
+medically-fit decision under a doctor's name it couldn't verify. Good behaviour, and demo material. Also seen: Slack
+turns typed quotes into curly quotes, so humans must never type JSON; agents build it. The agent's session predated
+`write`, so `/reset @discharge-lead` is needed after tool changes.
+
 ## Incidents
 - 01:47 IST: the bundled Postgres (127.0.0.1:52757, data in `%APPDATA%\switchdash\local-switch-server\native\pgdata`)
   was stopped by our own diagnostic (`pg_ctl stop` on the shared data folder). switch-core kept listening on :52755 but
