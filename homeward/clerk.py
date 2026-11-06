@@ -168,7 +168,8 @@ def cmd_register(args: list[str]) -> int:
 
 
 def list_rooms(cfg: dict) -> list[dict]:
-    return http("POST", f"{cfg['switch_url']}/agents/{cfg['agent_id']}/ops/list_rooms", {}, token=cfg["api_key"])
+    out = http("POST", f"{cfg['switch_url']}/agents/{cfg['agent_id']}/ops/list_rooms", {}, token=cfg["api_key"])
+    return out.get("result", []) if isinstance(out, dict) else out   # operations answer {"result": ...}
 
 
 def resolve_room(rooms: list[dict], name: str) -> Optional[str]:

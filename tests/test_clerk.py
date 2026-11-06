@@ -117,3 +117,9 @@ def test_run_survives_sim_reset(sim, monkeypatch):
     clerk.run(["--interval", "0"], post=lambda r, t: posts.append((r, t)), max_cycles=3,
               sleep=lambda _: (next(script, lambda: None))())
     assert len([p for p in posts if p[1].startswith("@lead EPR update")]) == 1
+
+
+def test_list_rooms_unwraps_operation_result(monkeypatch):
+    rooms = [{"room_id": "r2", "name": "SwitchAi: discharge-bed-12"}]
+    monkeypatch.setattr(clerk, "http", lambda *a, **k: {"result": rooms})
+    assert clerk.list_rooms({"switch_url": "x", "agent_id": "a", "api_key": "k"}) == rooms
