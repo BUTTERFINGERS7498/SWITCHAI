@@ -25,6 +25,10 @@ medically-fit decision under a doctor's name it couldn't verify. Good behaviour,
 turns typed quotes into curly quotes, so humans must never type JSON; agents build it. The agent's session predated
 `write`, so `/reset @discharge-lead` is needed after tool changes.
 
+## First agent write (03:35 IST)
+After D26, `discharge-lead` ran `homeward.py write PATCH patients/12/tasks/t5` as itself (agent, coordinator) with
+detail "reported by nurse-amy: daughter Sarah told at 10:05". Ledger verified: exactly one change, other tasks untouched.
+
 ## Incidents
 - 01:47 IST: the bundled Postgres (127.0.0.1:52757, data in `%APPDATA%\switchdash\local-switch-server\native\pgdata`)
   was stopped by our own diagnostic (`pg_ctl stop` on the shared data folder). switch-core kept listening on :52755 but
