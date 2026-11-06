@@ -94,6 +94,7 @@ class BookingIn(BaseModel):
     slot: datetime
     actor: ActorIn
     vehicle: Optional[str] = None
+    approver: Optional[ActorIn] = None  # the nurse who approved the Switch card: request + confirm in one call
 
 
 class ConfirmIn(BaseModel):
@@ -258,6 +259,13 @@ def request_booking(bed: int, body: BookingIn):
     s = store()
     with s.lock:
         b = s.request_booking(bed, utc(body.slot), body.actor.to_actor(), body.vehicle)
+        if body.approver is not None:
+            try:
+                b = s.confirm_booking(bed, b.id, b.approval_id, body.approver.to_actor())
+            except HomewardError:
+                s.decline_booking(bed, b.id, body.actor.to_actor())  # roll back the hold
+                raise
+            return s.booking_view(b)
     return {**s.booking_view(b), "next": f"a nurse must approve: POST /patients/{bed}/transport/bookings/{b.id}/confirm"}
 
 

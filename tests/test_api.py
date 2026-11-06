@@ -277,3 +277,23 @@ def test_coordinator_agent_still_cannot_do_clinical_or_approve(api):
     err(api.patch(f"/patients/12/tasks/{task_id(api, 12, 'letter_signed')}",
                   json={"status": "done", "actor": LEAD}), 403, "HUMAN_ONLY")
     err(api.post("/patients/12/mffd", json={"pathway": "P0", "actor": LEAD}), 403, "HUMAN_ONLY")
+
+
+def test_booking_with_approver_is_one_call(api):
+    mffd(api)
+    api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT})
+    b = api.post("/patients/12/transport/bookings",
+                 json={"slot": t("12:15"), "actor": TRANSPORT, "approver": NURSE}).json()
+    assert b["status"] == "confirmed" and b["approved_by"] == "nurse-amy"
+    assert task(api, 12, "transport_booked")["status"] == "in_progress"
+    actions = [x["action"] for x in api.get("/patients/12/ledger").json()]
+    assert actions[-2:] == ["task.awaiting_approval", "task.in_progress"]
+
+
+def test_booking_with_agent_as_approver_is_rolled_back(api):
+    mffd(api)
+    api.post("/patients/12/tto/request", json={"actor": PHARM_AGENT})
+    err(api.post("/patients/12/transport/bookings",
+                 json={"slot": t("12:15"), "actor": TRANSPORT, "approver": TRANSPORT}), 409, "APPROVAL_REQUIRED")
+    assert task(api, 12, "transport_booked")["status"] == "ready"
+    assert t("12:15") in api.get("/transport/slots", params={"vehicle": "wheelchair"}).json()["slots"]

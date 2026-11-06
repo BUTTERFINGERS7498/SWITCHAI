@@ -75,6 +75,9 @@ def base_url() -> str:
 
 def http(method: str, path: str, body=None):
     """Return (status, parsed_body). Raises ConnectionError if the sim is down."""
+    if "?" in path:  # '+' in a query means space; keep timezone offsets like +00:00 intact
+        base, query = path.split("?", 1)
+        path = base + "?" + query.replace("+", "%2B")
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(base_url() + path, data=data, method=method,
                                  headers={"content-type": "application/json", "accept": "application/json"})
@@ -99,6 +102,8 @@ def summarize(path: str, out) -> str:
             cost = out.get("cost") or {}
             extra = f" | {cost.get('hours')} bed-hours, £{cost.get('gbp')}" if cost else ""
             return out["summary"] + extra
+        if out.get("status") == "confirmed" and "slot" in out:
+            return f"Booking {out['id']} confirmed: {out['vehicle']} pickup {out['slot'][11:16]}, approved by {out['approved_by']}."
         if out.get("status") == "pending_approval":
             return (f"Booking {out['id']} for {out['slot'][11:16]} is waiting for nurse approval "
                     f"(approval_id {out['approval_id']}).")

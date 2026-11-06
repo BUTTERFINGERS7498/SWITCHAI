@@ -103,3 +103,8 @@ def test_paths_without_slash_and_git_bash_rewrite(fresh):
     assert run(fresh, "read", "C:/Program Files/Git/patients/12")[0] == 0
     assert run(fresh, "read", "C:/Users/x/secrets.txt")[0] == 2   # not an API path
     assert run(fresh, "read", "etc/passwd")[0] == 2
+
+
+def test_query_with_timezone_offset(fresh):
+    code, out = run(fresh, "read", "transport/slots?vehicle=wheelchair&after=2026-11-07T12:05:00+00:00")
+    assert code == 0 and last_json(out)["slots"][0] == "2026-11-07T12:15:00+00:00"
