@@ -13,8 +13,9 @@ terminal (EPR MFFD and letter, clock, provider cancellation). Sim on pre-P6 code
 | 11:00 | Letter signed in EPR | dr-raj (hospital system) | — |
 | 11:20 | Provider cancelled 11:45 (vehicle breakdown); board BLOCKED | transport-system | — |
 | 11:20 | Rebooked 12:00 after one prompt | transport-liaison (agent) | A-3, nurse-amy |
-| — | Shift handover answered by @lead | discharge-lead | — |
+| — | Shift handover asked of @lead (step 6; answer not separately confirmed) | discharge-lead | — |
 | 12:00 / 12:10 | Crew collected; departed 12:10 | crew (hospital system) | — |
+| after 12:10 | "@lead is Margaret home?" answered correctly (step 7, confirmed by Sarvagya) | discharge-lead | — |
 
 Result: home 12:10 vs 19:10 baseline (7.0 bed-hours freed). 2 human approvals in the hospital ledger, 6 agent
 writes, 0 clinical actions by agents.
@@ -24,3 +25,5 @@ Findings
 - Approval cards appear for every `homeward.py write`; reads run freely.
 - Old code escalated instantly on cancellation ("80 min since ready"); fixed in P6 (D34) before this run was repeated.
 - With P6 timings (50+55 min) the same flow gives the dossier story: 12:15 -> cancelled -> 12:30 -> home 12:40.
+
+Pending from this run: boundary checks (letter, TTO status, MFFD for bed 15, booking for unfit bed 15).
