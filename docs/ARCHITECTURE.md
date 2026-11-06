@@ -60,10 +60,17 @@ Simulated systems act on the clock: pharmacy verifies (40 min) and dispenses (45
 collects at the slot (or leaves if the patient isn't ready) and the patient departs 10 min later; doctors sign
 letters in the "EPR" via `letter_signed`. Agents never act as those people.
 
-Tool names (TASK-004) map 1:1: `hospital.get_patient`, `plan.get`, `plan.blocker`, `pharmacy.get_tto`,
-`transport.eligibility`, `transport.slots`, `transport.request_booking`, `transport.confirm`,
-`plan.update_task`, `board.ward`. Fallback if MCP is not visible to agents:
-`python scripts/homeward.py call <METHOD> <path> [json]` via an allow-listed command.
+## Agent tools (P3)
+Agents use two stdlib-only commands from the repo folder (their Switch working directory):
+```
+python scripts/homeward.py read <path>                          # GET only; auto-allowed
+python scripts/homeward.py write <POST|PATCH> <path> '<json>'   # changes state; Switch approval card
+```
+Output: an optional one-line human summary (blocker line, `REJECTED <code>: <message>`, booking awaiting approval),
+then the JSON on the last line. Exit codes: 0 ok, 1 rejected by Homeward, 2 usage, 3 sim unreachable.
+Base URL from `HOMEWARD_URL` (default `http://127.0.0.1:8765`). Approval: Claude Code project rule in
+`.claude/settings.json`: `allow` `Bash(python scripts/homeward.py read:*)`, `ask` `Bash(python scripts/homeward.py write:*)`.
+MCP wrapper dropped (cut list item 1); the CLI is the tool surface.
 
 ## Switch spike (gating checks, run by a human; fallbacks in DECISIONS.md)
 1 server up · 2 Claude Code answers an @role in one room · 3 room document write then read-back ·

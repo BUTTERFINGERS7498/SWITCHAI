@@ -1,6 +1,6 @@
 # PROJECT_STATE
 
-Updated: 2026-11-07 (P2 done)
+Updated: 2026-11-07 (P3 done)
 
 ## Requirements
 Flip the Switch hackathon, Track 01. Homeward: agents + humans in Switch rooms clear non-clinical discharge
@@ -19,14 +19,14 @@ See `docs/DECISIONS.md`.
 | P0 | Switch spike | done except check 4 (approval card) - see docs/SPIKE.md |
 | P1 | readiness engine `homeward/engine.py` | done (32 tests) |
 | P2 | simulator `homeward/sim/` | done (19 API tests) |
-| P3 | agent CLI `homeward.py read/write` | next |
-| P4 | Switch rooms, roles, approvals | pending |
+| P3 | agent CLI `homeward.py read/write` | done (7 end-to-end CLI tests) |
+| P4 | Switch rooms, roles, approvals | next |
 | P5 | board page | pending |
 | P6 | scenario runner | pending |
 | P7-P9 | README, video, submit | pending |
 
 ## Completed
-- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 60 tests pass: `python scripts/homeward.py test`.
+- TASK-001 bootstrap + contract (v1.1.0 now). P1 engine. P2 sim. 67 tests pass: `python scripts/homeward.py test`.
 
 ## Pending / issues
 - Switch spike not yet run (needs human at Console). Not verified that Switch runs on either machine.
@@ -34,4 +34,4 @@ See `docs/DECISIONS.md`.
 - Repo is private; must be made public before submission.
 
 ## Current next task
-P3: `python scripts/homeward.py read <path>` / `write <METHOD> <path> <json>` + Claude Code ask rule for write.
+P4: role instruction files in `switch/`, rooms #ward-7 / #discharge-bed-12 / #pharmacy / #transport-desk, agents discharge-lead / pharmacy-liaison / transport, approval card re-test.
