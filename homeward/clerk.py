@@ -5,7 +5,8 @@ sim's ledger and posts plain-language announcements into the Switch rooms, addre
 the next step (`@lead`, `@meds`, `@transport`). It never changes hospital state; it only reads the sim
 and posts messages.
 
-  python scripts/homeward.py clerk register        one-off; needs SWITCH_REGISTRATION_KEY in the environment
+  python scripts/homeward.py clerk register --login   one-off: log in to the Switch Gateway, mint a key, register
+  python scripts/homeward.py clerk register           same, with SWITCH_REGISTRATION_KEY from the environment
   python scripts/homeward.py clerk rooms           list the Switch rooms the clerk belongs to
   python scripts/homeward.py clerk run [--bed 12] [--ward-room ward-7] [--bed-room discharge-bed-12]
                                        [--interval 2] [--dry-run] [--from-start]
@@ -110,11 +111,36 @@ def load_config() -> dict:
     return json.loads(CONFIG.read_text(encoding="utf-8"))
 
 
+def mint_registration_key() -> Optional[str]:
+    """Log in to the Switch Gateway as yourself and mint a personal registration key (owned by you, so the
+    clerk counts as one of your agents). Prompts in this terminal; nothing is printed or stored."""
+    import getpass
+    import http.cookiejar
+    email = input("Switch Gateway email: ").strip()
+    password = getpass.getpass("Switch Gateway password (hidden): ")
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+
+    def gw(path, body):
+        req = urllib.request.Request(f"{SWITCH}/gateway{path}", data=json.dumps(body).encode(), method="POST",
+                                     headers={"content-type": "application/json"})
+        with opener.open(req, timeout=10) as r:
+            return json.loads(r.read() or b"{}")
+    try:
+        gw("/auth/login", {"email": email, "password": password})
+        return gw("/api-keys", {"label": NAME})["key"]
+    except urllib.error.HTTPError as ex:
+        print(f"Gateway refused ({ex.code}): check the email and password.")
+        return None
+
+
 def cmd_register(args: list[str]) -> int:
-    key = os.environ.get("SWITCH_REGISTRATION_KEY")
+    key = mint_registration_key() if "--login" in args else os.environ.get("SWITCH_REGISTRATION_KEY")
     if not key:
-        print("Set SWITCH_REGISTRATION_KEY first (Switch Gateway -> API Keys -> Create Registration Key).\n"
-              "PowerShell:  $env:SWITCH_REGISTRATION_KEY = '<key>'; python scripts/homeward.py clerk register")
+        if "--login" not in args:
+            print("Log in and let the clerk mint its own registration key:\n"
+                  "  python scripts/homeward.py clerk register --login\n"
+                  "or set SWITCH_REGISTRATION_KEY (Gateway -> API Keys -> Create Registration Key) and run\n"
+                  "  python scripts/homeward.py clerk register")
         return 2
     body = {
         "name": NAME,

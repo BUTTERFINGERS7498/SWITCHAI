@@ -80,14 +80,14 @@ Alternative: Gateway → room page → **Add role** / **Add linked room**.
 ## 8. The ward clerk (custom agent over the Switch agent protocol)
 `ward-clerk` is a deterministic program, not an LLM. It watches the sim and posts hospital-system events into the
 rooms, addressing the job that owns the next step (e.g. `@transport` when the provider cancels).
-1. Switch Gateway (http://localhost:52755) → **API Keys** → **Create Registration Key**, label `ward-clerk`.
-   Create it under your own account so the clerk counts as one of *your* agents.
-2. In a terminal in `repo/` (the key is only read from the environment, never stored in the repo):
+1. In a terminal in `repo/`, register it as one of *your* agents. It asks for your Switch Gateway login (password
+   hidden), mints a personal registration key and registers; it prints and stores neither:
    ```
-   $env:SWITCH_REGISTRATION_KEY = '<the key>'      # PowerShell
-   python scripts/homeward.py clerk register
+   python scripts/homeward.py clerk register --login
    ```
-   Its own API key is saved to `.homeward/clerk.json` (git-ignored).
+   Switch Console's local native server doesn't serve the Gateway web pages, so this is the easy route. (With a
+   registration key from the Gateway's **API Keys** page instead: set `SWITCH_REGISTRATION_KEY`, run `clerk register`.)
+2. The clerk's own API key is saved to `.homeward/clerk.json` (git-ignored).
 3. In Slack: `!invite-agent @ward-clerk` in `#ward-7` and in `#discharge-bed-12`.
 4. Check: `python scripts/homeward.py clerk rooms` lists both rooms.
 5. Run it next to the sim: `python scripts/homeward.py clerk run` (add `--dry-run` to print instead of post).
