@@ -13,7 +13,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-CONTRACT_VERSION = "1.0.0"
+CONTRACT_VERSION = "1.1.0"
 
 # --- Constants (from the dossier; illustrative, synthetic) -------------------
 BED_DAY_GBP = 562.0
@@ -73,7 +73,8 @@ TRANSITIONS: dict[TaskStatus, frozenset[TaskStatus]] = {
                                  TaskStatus.DONE, TaskStatus.BLOCKED, TaskStatus.CANCELLED}),
     TaskStatus.IN_PROGRESS: frozenset({TaskStatus.AWAITING_APPROVAL, TaskStatus.DONE,
                                        TaskStatus.BLOCKED, TaskStatus.CANCELLED}),
-    TaskStatus.AWAITING_APPROVAL: frozenset({TaskStatus.DONE, TaskStatus.READY,
+    # -> IN_PROGRESS = approved, now executing (e.g. transport booked, awaiting pickup)
+    TaskStatus.AWAITING_APPROVAL: frozenset({TaskStatus.IN_PROGRESS, TaskStatus.DONE, TaskStatus.READY,
                                              TaskStatus.BLOCKED, TaskStatus.CANCELLED}),
     TaskStatus.BLOCKED: frozenset({TaskStatus.READY, TaskStatus.CANCELLED}),
     TaskStatus.DONE: frozenset(),

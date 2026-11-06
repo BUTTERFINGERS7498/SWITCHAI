@@ -21,3 +21,6 @@
 | D17 | One FastAPI process serves API and board on :8765 | One thing to start | agreed (solo plan) |
 | D18 | Engine: AWAITING_APPROVAL -> DONE and departure require a HUMAN actor; nurse may complete any non-clinical task | Approvals enforced in code, not just in chat | P1 |
 | D19 | Demo times are UTC (UK time in November) | No timezone conversion needed | P1 |
+| D20 | Contract 1.1.0: AWAITING_APPROVAL -> IN_PROGRESS allowed (approved, executing); leaving AWAITING_APPROVAL for IN_PROGRESS/DONE needs a HUMAN | Transport is "booked, awaiting pickup" after approval, so a cancellation can reopen it | P2 |
+| D21 | Hospital systems (pharmacy, crews, EPR letter signing) are simulated on the clock; agents can't set TTO status or complete transport | Agents never impersonate staff | P2 |
+| D22 | Cancelled booking's slot stays taken (vehicle went elsewhere) | Makes the rebook land on 12:30 -> departure 12:40, matching the dossier story | P2 |

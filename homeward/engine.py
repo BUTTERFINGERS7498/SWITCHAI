@@ -103,14 +103,15 @@ def apply_transition(p: Patient, task_id: str, dst: TaskStatus, actor: Actor, no
     if dst in (TaskStatus.IN_PROGRESS, TaskStatus.AWAITING_APPROVAL, TaskStatus.DONE) and not _deps_done(p, t):
         raise HomewardError(ErrorCode.DEPENDENCY_UNMET, f"{t.id} depends on unfinished tasks",
                             {"task_id": t.id, "depends_on": t.depends_on})
+    approving = src == TaskStatus.AWAITING_APPROVAL and dst in (TaskStatus.IN_PROGRESS, TaskStatus.DONE)
+    if approving and actor.type != ActorType.HUMAN:
+        raise HomewardError(ErrorCode.APPROVAL_REQUIRED, f"{t.id} needs a human approval",
+                            {"task_id": t.id})
     if dst == TaskStatus.DONE:
         if t.human_only and not (actor.type == ActorType.HUMAN and actor.role == t.owner_role):
             raise HomewardError(ErrorCode.HUMAN_ONLY,
                                 f"{TASK_LABEL[t.kind]} is a clinical task: only a {t.owner_role.value} can complete it",
                                 {"task_id": t.id, "owner_role": t.owner_role.value})
-        if src == TaskStatus.AWAITING_APPROVAL and actor.type != ActorType.HUMAN:
-            raise HomewardError(ErrorCode.APPROVAL_REQUIRED, f"{t.id} needs a human approval to complete",
-                                {"task_id": t.id})
         if actor.type == ActorType.HUMAN and actor.role not in (t.owner_role, Role.NURSE):
             raise HomewardError(ErrorCode.FORBIDDEN_ROLE,
                                 f"a {actor.role.value} cannot complete {TASK_LABEL[t.kind]}",

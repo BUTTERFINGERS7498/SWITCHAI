@@ -33,26 +33,32 @@ escalations, idempotent), `overdue`, `cost`, `can_depart`, `depart`, `handover_s
   Other roles get `FORBIDDEN_ROLE`. Agents may complete non-clinical tasks that need no approval.
 - Nudges at 1x and 1.5x the target, escalation to bed_manager at 2x; BLOCKED -> READY restarts the clock.
 
-## REST API (TASK-003 implements; all bodies JSON; times ISO-8601 UTC; bed = int)
-Errors: `{"error":{"code","message","details"}}`; 404 NOT_FOUND, 409 INVALID_TRANSITION/DEPENDENCY_UNMET/
-PICKUP_TOO_EARLY/APPROVAL_REQUIRED, 403 HUMAN_ONLY/FORBIDDEN_ROLE, 422 VALIDATION.
+## REST API (`homeward/sim/app.py`, built in P2; port 8765; OpenAPI at `/docs`)
+Errors: `{"error":{"code","message","details"}}`; 404 NOT_FOUND, 403 HUMAN_ONLY/FORBIDDEN_ROLE, 422 VALIDATION,
+409 INVALID_TRANSITION/DEPENDENCY_UNMET/PICKUP_TOO_EARLY/APPROVAL_REQUIRED. Times ISO-8601 (naive = UTC).
+Actors: `{"id","role","type": human|agent|system}`.
 
-| Method + path | Purpose | Write? |
+| Method + path | Purpose | Who |
 |---|---|---|
-| `GET /clock` / `POST /clock {"now"}` or `{"advance_minutes"}` | scenario clock | write |
-| `GET /patients` / `GET /patients/{bed}` | list / get (with tasks) | read |
-| `POST /patients/{bed}/mffd {"pathway","actor"}` | declare MFFD, build plan | write |
-| `GET /patients/{bed}/plan` | tasks + statuses + ETAs | read |
-| `GET /patients/{bed}/blocker` | current `Blocker` + cost so far | read |
-| `PATCH /patients/{bed}/tasks/{task_id} {"status","actor","eta?"}` | validated transition | write |
-| `GET /patients/{bed}/tto` | TTO status + ready ETA | read |
-| `GET /patients/{bed}/transport/eligibility` | vehicle/mobility rules | read |
-| `GET /transport/slots?vehicle=&after=` | available slots | read |
-| `POST /patients/{bed}/transport/bookings {"slot","actor"}` | request booking -> returns `approval_id`, task AWAITING_APPROVAL | write |
-| `POST /patients/{bed}/transport/bookings/{id}/confirm {"approval_id","approver"}` | human-approved confirm | write |
-| `GET /patients/{bed}/ledger` | approvals + actions | read |
-| `GET /board/ward` | board snapshot (blockers, timers, cost, ledger tail) | read |
-| `POST /events {"type","bed","at?"}` | scenario injection, e.g. `transport_cancelled` | write |
+| `GET /health`, `POST /reset {"scenario"}` | status / reseed ward 7 at 10:00 | runner |
+| `GET /clock`, `POST /clock {"now"} or {"advance_minutes"}` | scenario clock; fires due events, nudges | runner |
+| `GET /patients`, `GET /patients/{bed}` | ward list with blocker / one patient + eligibility + plan | agents |
+| `POST /patients/{bed}/mffd {"pathway","actor","letter_eta?"}` | declare medically fit (doctor only) | human |
+| `GET /patients/{bed}/plan` · `/blocker` · `/handover` · `/ledger` | tasks / blocker+cost+overdue / shift handover text / audit | agents |
+| `PATCH /patients/{bed}/tasks/{id} {"status","actor","eta?"}` | validated transition (not TTO, not transport completion) | agents/humans |
+| `GET /patients/{bed}/tto`, `POST /patients/{bed}/tto/request {"actor","priority"}` | pharmacy status / send TTO request | pharmacy agent |
+| `GET /patients/{bed}/transport/eligibility` | vehicle + earliest pickup | transport agent |
+| `GET /transport/slots?vehicle=&after=` | free 15-min slots 11:00-18:00 | transport agent |
+| `POST /patients/{bed}/transport/bookings {"slot","actor","vehicle?"}` | request -> AWAITING_APPROVAL + `approval_id` | transport agent |
+| `POST .../bookings/{id}/confirm {"approval_id","approver"}` | nurse approval -> IN_PROGRESS, pickup scheduled | human (nurse) |
+| `POST .../bookings/{id}/decline {"approver"}` | decline -> READY, slot freed | human |
+| `POST /patients/{bed}/depart {"approver"}` | manual departure (normally crew at pickup +10 min) | human |
+| `GET /board/ward`, `GET /board` | board JSON / board page (P5) | board |
+| `POST /events {"type","bed","at?",...}` | `transport_cancelled`, `letter_signed`, `tto_delayed`; `at` schedules it | runner |
+
+Simulated systems act on the clock: pharmacy verifies (40 min) and dispenses (45 min) after a request; the crew
+collects at the slot (or leaves if the patient isn't ready) and the patient departs 10 min later; doctors sign
+letters in the "EPR" via `letter_signed`. Agents never act as those people.
 
 Tool names (TASK-004) map 1:1: `hospital.get_patient`, `plan.get`, `plan.blocker`, `pharmacy.get_tto`,
 `transport.eligibility`, `transport.slots`, `transport.request_booking`, `transport.confirm`,

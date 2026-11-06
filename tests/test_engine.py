@@ -113,8 +113,12 @@ def test_awaiting_approval_needs_a_human():
     with pytest.raises(c.HomewardError) as ex:
         e.apply_transition(p, tr, S.DONE, AGENT_TRANSPORT, at(21), approval_id="A-1")
     assert ex.value.code == c.ErrorCode.APPROVAL_REQUIRED
-    entries = e.apply_transition(p, tr, S.DONE, NURSE, at(22), approval_id="A-1")
+    with pytest.raises(c.HomewardError) as ex2:
+        e.apply_transition(p, tr, S.IN_PROGRESS, AGENT_TRANSPORT, at(21), approval_id="A-1")
+    assert ex2.value.code == c.ErrorCode.APPROVAL_REQUIRED
+    entries = e.apply_transition(p, tr, S.IN_PROGRESS, NURSE, at(22), approval_id="A-1")
     assert entries[0].approval_id == "A-1" and entries[0].actor == NURSE
+    assert e.get_task(p, tr).status == S.IN_PROGRESS
 
 
 def test_agent_can_complete_non_clinical_task():
