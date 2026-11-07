@@ -35,12 +35,27 @@ async def base_audio(text, voice, rate, out_mp3):
     await edge_tts.Communicate(text, voice, rate=rate).save(str(out_mp3))
 
 
+# Spoken forms for names and terms the base voice tends to mangle (applied to the text sent to the TTS only).
+PRONUNCIATION = [
+    (r"\bEPR\b", "E P R"), (r"\bTTO\b", "T T O"), (r"\bA&E\b", "A and E"),
+    (r"\bHomeward\b", "Home-ward"), (r"\bUK\b", "U K"), (r"\bNHS\b", "N H S"), (r"\bAI\b", "A I"),
+    (r"\bnurse-amy\b", "Nurse Amy"), (r"\bDr\b", "Doctor"),
+]
+MARGARET = "Margaret"   # spoken form, set with --margaret (e.g. "Margret" or "Mar-guh-ret")
+
+
 def say_text(t):
-    return re.sub(r"\s+", " ", t.replace("£", "pounds ").replace("&", " and ")).strip()
+    t = t.replace("£", "pounds ").replace("&", " and ")
+    t = re.sub(r"\bMargaret\b", MARGARET, t)
+    for pat, rep in PRONUNCIATION:
+        t = re.sub(pat, rep, t)
+    return re.sub(r"\s+", " ", t).strip()
 
 
 def main():
-    base, rate = opt("--base", "en-IN-PrabhatNeural"), opt("--rate", "-4%")
+    base, rate = opt("--base", "en-IN-PrabhatNeural"), opt("--rate", "-3%")
+    global MARGARET
+    MARGARET = opt("--margaret", "Margaret")
     ref = Path(opt("--ref", str(HERE / "voice-ref" / "ref.wav")))
     import torch
     from TTS.api import TTS
@@ -61,9 +76,10 @@ def main():
            "-af", "highpass=f=60,loudnorm=I=-18:TP=-2:LRA=7", "-b:a", "160k", str(mp3))
 
     if "--test" in sys.argv:
-        out = HERE / "voice-test-vc.wav"
+        tag = re.sub(r"[^a-z]", "", MARGARET.lower())
+        out = HERE / f"voice-test-in-{tag}.wav"
         convert(TEST_LINE, out)
-        finish(out, HERE / "voice-test-vc.mp3")
+        finish(out, out.with_suffix(".mp3"))
         print(f"wrote {out.with_suffix('.mp3')}")
         return
     for name in SCENARIOS:
