@@ -123,3 +123,24 @@ def test_list_rooms_unwraps_operation_result(monkeypatch):
     rooms = [{"room_id": "r2", "name": "SwitchAi: discharge-bed-12"}]
     monkeypatch.setattr(clerk, "http", lambda *a, **k: {"result": rooms})
     assert clerk.list_rooms({"switch_url": "x", "agent_id": "a", "api_key": "k"}) == rooms
+
+
+def test_reset_and_new_event_in_one_poll_interval(sim, monkeypatch):
+    """The live bug: scenario resets and re-declares MFFD instantly, so the ledger length doesn't change."""
+    monkeypatch.setattr(clerk, "SIM", sim)
+    call(sim, "POST", "/reset", {"scenario": "margaret"})
+    call(sim, "POST", "/patients/12/mffd", {"pathway": "P0", "actor": {"id": "dr-raj", "role": "doctor"}})
+    posts = []
+
+    def reset_and_declare(_):
+        call(sim, "POST", "/reset", {"scenario": "margaret"})
+        call(sim, "POST", "/patients/12/mffd", {"pathway": "P0", "actor": {"id": "dr-raj", "role": "doctor"}})
+
+    clerk.run(["--interval", "0"], post=lambda r, t: posts.append((r, t)), max_cycles=2, sleep=reset_and_declare)
+    assert [r for r, t in posts if t.startswith("@lead EPR update")] == ["ward"]
+
+
+def test_health_reports_epoch(sim):
+    e0 = call(sim, "GET", "/health")["epoch"]
+    call(sim, "POST", "/reset", {"scenario": "margaret"})
+    assert call(sim, "GET", "/health")["epoch"] == e0 + 1

@@ -221,17 +221,20 @@ def run(args: list[str], post: Optional[Callable[[str, str], None]] = None, max_
                      {"room_id": _ids[room], "content": text}, token=_cfg["api_key"])
 
     seen = None if "--from-start" not in args else 0
+    epoch = None
     print(f"{NAME} watching bed {bed} on {SIM}; posting to #{rooms['ward']} and #{rooms['bed']}"
           f"{' (dry run)' if dry else ''}. Ctrl+C to stop.")
     cycles = 0
     while max_cycles is None or cycles < max_cycles:
         cycles += 1
         try:
+            ep = http("GET", f"{SIM}/health").get("epoch")
             ledger = http("GET", f"{SIM}/patients/{bed}/ledger")
             if seen is None:              # first look: announce only what happens from now on
                 seen = len(ledger)
-            elif len(ledger) < seen:      # the sim was reset: start again from the top
+            elif ep != epoch or len(ledger) < seen:   # the sim was reset: everything in it is new
                 seen = 0
+            epoch = ep
             fresh = ledger[seen:]
             if fresh:
                 try:

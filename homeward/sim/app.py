@@ -27,7 +27,7 @@ STATUS = {ErrorCode.NOT_FOUND: 404, ErrorCode.HUMAN_ONLY: 403, ErrorCode.FORBIDD
 
 app = FastAPI(title="Homeward sim", version=CONTRACT_VERSION,
               description="Simulated hospital systems + readiness engine for the Homeward Switch demo. Synthetic data only.")
-STATE = {"store": seed.build("margaret"), "scenario": "margaret"}
+STATE = {"store": seed.build("margaret"), "scenario": "margaret", "epoch": 0}   # epoch: bumps on every reset
 STATIC = Path(__file__).parent / "static"
 
 
@@ -122,7 +122,8 @@ def ledger_out(entries):
 # --- system ------------------------------------------------------------------------
 @app.get("/health")
 def health():
-    return {"ok": True, "contract": CONTRACT_VERSION, "scenario": STATE["scenario"], "now": store().clock.isoformat()}
+    return {"ok": True, "contract": CONTRACT_VERSION, "scenario": STATE["scenario"], "epoch": STATE["epoch"],
+            "now": store().clock.isoformat()}
 
 
 @app.post("/reset")
@@ -132,6 +133,7 @@ def reset(body: ResetIn = ResetIn()):
     except KeyError:
         raise HomewardError(ErrorCode.NOT_FOUND, f"unknown scenario {body.scenario}", {"known": list(seed.SCENARIOS)})
     STATE["scenario"] = body.scenario
+    STATE["epoch"] += 1
     return health()
 
 
