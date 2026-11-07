@@ -14,7 +14,7 @@
 
 ### 🎥 Watch the demo
 
-**[Demo video: link to be added]** <!-- TODO: paste the video URL before submitting -->
+**[▶ Watch the demo video (3:29)](https://youtu.be/vKqCjuzPtyU)**
 
 <sub>By <b>Team RE:SET</b> · built during the <b>Flip the Switch</b> hackathon (WeMakeDevs × DevTools Academy × Switch), Track 01: Best Business Workflow.</sub>
 
