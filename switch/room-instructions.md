@@ -32,7 +32,7 @@ hospital system ("Homeward sim") is the source of truth. Read it; never guess.
 | (hospital system) | `dr-raj` | doctor: declares MFFD and signs letters in the EPR, not in chat |
 | (hospital system) | `pharmacy-system` | pharmacy: verifies and dispenses TTOs |
 
-**Jobs in this room**
+**Jobs in this room** (patient rooms only; in `#ward-7`, `@lead` is a room alias for `discharge-lead`)
 - `@lead`: exclusive, held by `discharge-lead`. Owns the plan, the checklist document and "what's left?".
 - `@meds`: held by `pharmacy-liaison`. Sends and tracks the TTO request.
 - `@transport`: held by `transport-liaison`. Books transport timed to when meds and letter are ready.

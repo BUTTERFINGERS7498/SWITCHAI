@@ -63,6 +63,15 @@ Link the rooms (links are one-way, so both directions):
 @discharge-lead link this room to #ward-7 with the label "ward hub", and link #ward-7 back to this room with the label "bed 12"
 ```
 Check: `!roles` shows lead → discharge-lead, meds → pharmacy-liaison, transport → transport-liaison.
+
+**Jobs live only in patient rooms.** An agent holds one job at a time, server-wide: if `discharge-lead` takes `lead`
+in `#ward-7`, it drops `lead` in `#discharge-bed-12`. In the hub, use a room alias instead (aliases are per room and
+aren't jobs). In `#ward-7`:
+```
+!set-alias @discharge-lead @lead
+```
+Check with `!list-aliases`. (An alias can't share a name with a job in the same room, so don't define a `lead` job
+in `#ward-7`.)
 Alternative: Gateway → room page → **Add role** / **Add linked room**.
 
 ## 6. Conversation settings (type in `#discharge-bed-12`)
