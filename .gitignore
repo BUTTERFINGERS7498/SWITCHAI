@@ -18,3 +18,9 @@ demo/*.gif
 demo/*.storyboard.png
 demo/.frames/
 demo/voice/
+# personal voice samples: never commit
+*.m4a
+*.m4a.mp4
+SJR*
+demo/.voice-venv/
+demo/voice-ref/
