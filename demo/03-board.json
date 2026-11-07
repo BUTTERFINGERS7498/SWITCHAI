@@ -17,7 +17,7 @@
     "captions": true
   },
   "voice": {
-    "enabled": false,
+    "enabled": true,
     "language": "en"
   },
   "steps": [
@@ -35,7 +35,8 @@
     {
       "press": "n",
       "zoom": false,
-      "say": "This is the ward board, live from the same hospital system the agents use. Every person shows one honest answer: what they're waiting on, who owns it, and when."
+      "say": "This is the ward board, live from the same hospital system the agents use. Every person shows one honest answer: what they're waiting on, who owns it, and when.",
+      "audio": "voice/03-board/01.mp3"
     },
     {
       "press": "n",
@@ -49,7 +50,8 @@
       "zoomTo": "css=.card[data-bed=\"12\"]",
       "say": "Margaret was declared fit at ten. Within minutes the agents requested her medicines and booked a wheelchair for twelve fifteen, after the medicines will be ready.",
       "hold": 0.5,
-      "zoom": 1.7
+      "zoom": 1.7,
+      "audio": "voice/03-board/02.mp3"
     },
     {
       "press": "n",
@@ -62,7 +64,8 @@
     },
     {
       "highlight": "css=.card[data-bed=\"12\"]",
-      "say": "At eleven twenty, the transport provider cancels. The board turns amber, and the clerk tells the transport agent straight away."
+      "say": "At eleven twenty, the transport provider cancels. The board turns amber, and the clerk tells the transport agent straight away.",
+      "audio": "voice/03-board/03.mp3"
     },
     {
       "press": "n",
@@ -71,7 +74,8 @@
     {
       "highlight": "css=aside",
       "text": "Every approval is a nurse's",
-      "say": "It finds the next safe slot, twelve thirty, and a nurse approves it. Every change is recorded: who did it, and who said yes."
+      "say": "It finds the next safe slot, twelve thirty, and a nurse approves it. Every change is recorded: who did it, and who said yes.",
+      "audio": "voice/03-board/04.mp3"
     },
     {
       "press": "n",
@@ -80,7 +84,8 @@
     },
     {
       "click": "css=.card[data-bed=\"12\"]",
-      "say": "Margaret goes home at twelve forty, not ten past seven. That's six and a half hours of her day back, and a bed for the next patient."
+      "say": "Margaret goes home at twelve forty, not ten past seven. That's six and a half hours of her day back, and a bed for the next patient.",
+      "audio": "voice/03-board/05.mp3"
     },
     {
       "zoomTo": "css=#story .daytrack",
@@ -98,13 +103,15 @@
       "highlight": "text=3 · 0",
       "text": "3 nurse approvals · 0 clinical calls by agents",
       "say": "Agents did the chasing. Nurses approved every action. And the agents made zero clinical decisions.",
-      "hold": 0.8
+      "hold": 0.8,
+      "audio": "voice/03-board/06.mp3"
     },
     {
       "wait": 1,
       "zoom": false,
       "say": "Homeward. Dashboards show who's stuck. Homeward gets them home.",
-      "hold": 1.6
+      "hold": 1.6,
+      "audio": "voice/03-board/07.mp3"
     }
   ]
 }

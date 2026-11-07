@@ -20,7 +20,7 @@
     "captions": true
   },
   "voice": {
-    "enabled": false,
+    "enabled": true,
     "language": "en"
   },
   "steps": [
@@ -35,7 +35,8 @@
       "highlight": "text=EPR update: Dr Raj has declared Margaret Jones",
       "say": "Here it is in a real Slack workspace, connected through Switch. When the doctor marks Margaret fit in the hospital system, our ward clerk agent tells the ward room, and addresses the discharge lead.",
       "hold": 0.6,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/01.mp3"
     },
     {
       "click": "text=discharge-bed-12",
@@ -60,7 +61,8 @@
       "highlight": "text=confirmed fit in the hospital system",
       "say": "The lead checks the hospital system first, then hands the work out to the medicines and transport agents, by their jobs in the room.",
       "hold": 0.4,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/02.mp3"
     },
     {
       "hover": "text=Book wheelchair pickup 12:15",
@@ -70,7 +72,8 @@
       "highlight": "text=Book wheelchair pickup 12:15",
       "say": "The transport agent books for when the medicines will actually be ready, not as soon as possible.",
       "hold": 0.4,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/03.mp3"
     },
     {
       "hover": "text=Your message likely crossed mine",
@@ -80,7 +83,8 @@
       "highlight": "text=Your message likely crossed mine",
       "say": "The agents check each other's work, in plain sight of the team.",
       "hold": 0.4,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/04.mp3"
     },
     {
       "hover": "text=approved by nurse-amy",
@@ -90,7 +94,8 @@
       "highlight": "text=approved by nurse-amy",
       "say": "And nothing leaves the room without a nurse's yes, on Switch's approval card.",
       "hold": 0.8,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/05.mp3"
     },
     {
       "hover": "text=didn't say what was done",
@@ -100,7 +105,8 @@
       "highlight": "text=didn't say what was done",
       "say": "And when an update is vague, the lead won't record it until it knows who did what, and when. Every entry has a name on it.",
       "hold": 0.8,
-      "zoom": 1.35
+      "zoom": 1.35,
+      "audio": "voice/02-slack/06.mp3"
     }
   ]
 }
