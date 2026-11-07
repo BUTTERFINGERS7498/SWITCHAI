@@ -20,14 +20,14 @@ from homeward import engine as e
 from homeward.contracts import (
     CONTRACT_VERSION, Actor, ActorType, ErrorCode, HomewardError, Pathway, Role, TaskKind, TaskStatus, to_wire,
 )
-from homeward.sim import seed
+from homeward.sim import demo, seed
 
 STATUS = {ErrorCode.NOT_FOUND: 404, ErrorCode.HUMAN_ONLY: 403, ErrorCode.FORBIDDEN_ROLE: 403,
           ErrorCode.VALIDATION: 422}
 
 app = FastAPI(title="Homeward sim", version=CONTRACT_VERSION,
               description="Simulated hospital systems + readiness engine for the Homeward Switch demo. Synthetic data only.")
-STATE = {"store": seed.build("margaret"), "scenario": "margaret", "epoch": 0}   # epoch: bumps on every reset
+STATE = {"store": seed.build("margaret"), "scenario": "margaret", "epoch": 0, "demo": 0}  # epoch: bumps on reset
 STATIC = Path(__file__).parent / "static"
 
 
@@ -134,6 +134,7 @@ def reset(body: ResetIn = ResetIn()):
         raise HomewardError(ErrorCode.NOT_FOUND, f"unknown scenario {body.scenario}", {"known": list(seed.SCENARIOS)})
     STATE["scenario"] = body.scenario
     STATE["epoch"] += 1
+    STATE["demo"] = 0
     return health()
 
 
@@ -309,3 +310,12 @@ def post_event(body: EventIn):
                                           "minutes": body.minutes, "doctor": body.doctor})
     return {"now": s.clock.isoformat(), "scheduled": bool(body.at and utc(body.at) > s.clock),
             "events": ledger_out(fired)}
+
+
+@app.post("/demo/next")
+def demo_next():
+    """Presenter mode for filming: replay Margaret's day one beat at a time (same operations as --auto)."""
+    s = store()
+    with s.lock:
+        STATE["demo"], label = demo.next_beat(s, STATE["demo"])
+    return {"beat": STATE["demo"], "of": len(demo.BEATS), "label": label, "now": s.clock.isoformat()}

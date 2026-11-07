@@ -311,3 +311,16 @@ def test_board_people_totals(api):
     assert d["ready"] == 2 and d["home"] == 0 and d["clinical_by_agents"] == 0 and d["hours_freed"] == 0
     clock(api, "11:10")
     assert api.get("/board/ward").json()["totals"]["home"] == 1   # Arthur
+
+
+def test_demo_beats_replay_the_day(api):
+    labels = [api.post("/demo/next").json()["label"] for _ in range(6)]
+    assert labels[0].startswith("10:00") and labels[3].startswith("11:20")
+    p = api.get("/patients/12").json()
+    assert p["departed_at"] == t("12:40")
+    ledger = api.get("/patients/12/ledger").json()
+    approvals = [x for x in ledger if x["approval_id"] and x["actor"]["type"] == "human"]
+    assert [x["actor"]["id"] for x in approvals] == ["nurse-amy", "nurse-amy"]
+    assert api.post("/demo/next").json()["label"] == "end of the day"
+    api.post("/reset", json={})
+    assert api.post("/demo/next").json()["beat"] == 1

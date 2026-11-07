@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gmpetrov/agent-screenplay/main/schema/scenario.schema.json",
+  "url": "explainer.html",
+  "style": {
+    "background": {
+      "gradient": [
+        "#0f1a22",
+        "#16303a"
+      ],
+      "angle": 135
+    },
+    "padding": 0,
+    "radius": 0,
+    "shadow": false,
+    "frame": "none",
+    "maxZoom": 1,
+    "captions": true,
+    "cursor": "none"
+  },
+  "voice": {
+    "enabled": false,
+    "language": "en"
+  },
+  "steps": [
+    {
+      "wait": 1.2,
+      "zoom": false,
+      "say": "This is Margaret. She's eighty-two, and at ten this morning her doctor said she was well enough to go home.",
+      "hold": 0.6
+    },
+    {
+      "press": "ArrowRight",
+      "zoom": false,
+      "say": "She finally left the ward at ten past seven in the evening. Not one minute of those nine hours was medical.",
+      "hold": 1.6
+    },
+    {
+      "press": "ArrowRight",
+      "zoom": false,
+      "say": "And she isn't alone. Every day in England, around thirteen thousand people who are well enough to leave are still in a hospital bed. That's one bed in ten, and two point seven billion pounds a year.",
+      "hold": 0.8
+    },
+    {
+      "press": "ArrowRight",
+      "zoom": false,
+      "say": "The delay isn't medical. It's coordination. Medicines are requested late, transport turns up before they're ready, the letter waits for a signature, and everyone chases everyone.",
+      "hold": 0.8
+    },
+    {
+      "press": "ArrowRight",
+      "zoom": false,
+      "say": "In phone calls and group chats, all day long. Dashboards can show who's stuck. But nobody owns the chase.",
+      "hold": 2.2
+    },
+    {
+      "press": "ArrowRight",
+      "zoom": false,
+      "say": "Homeward changes that. It puts AI agents into the team's chat, one Switch room per patient. The agents do the chasing. A nurse approves every action. And every clinical decision stays with the doctors.",
+      "hold": 1.0
+    }
+  ]
+}

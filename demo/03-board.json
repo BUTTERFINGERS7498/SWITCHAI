@@ -1,0 +1,110 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gmpetrov/agent-screenplay/main/schema/scenario.schema.json",
+  "url": "http://127.0.0.1:8799/board?presenter=1&theme=dark&size=large",
+  "style": {
+    "background": {
+      "gradient": [
+        "#0f1a22",
+        "#16303a"
+      ],
+      "angle": 135
+    },
+    "padding": 56,
+    "radius": 16,
+    "shadow": true,
+    "frame": "browser",
+    "maxZoom": 1.8,
+    "captions": true
+  },
+  "voice": {
+    "enabled": false,
+    "language": "en"
+  },
+  "steps": [
+    {
+      "wait": "text=People on the ward"
+    },
+    {
+      "press": "r",
+      "zoom": false
+    },
+    {
+      "wait": "text=Not yet fit to leave",
+      "zoom": false
+    },
+    {
+      "press": "n",
+      "zoom": false,
+      "say": "This is the ward board, live from the same hospital system the agents use. Every person shows one honest answer: what they're waiting on, who owns it, and when."
+    },
+    {
+      "press": "n",
+      "zoom": false
+    },
+    {
+      "scroll": "down",
+      "zoom": false
+    },
+    {
+      "zoomTo": "css=.card[data-bed=\"12\"]",
+      "say": "Margaret was declared fit at ten. Within minutes the agents requested her medicines and booked a wheelchair for twelve fifteen, after the medicines will be ready.",
+      "hold": 0.5,
+      "zoom": 1.7
+    },
+    {
+      "press": "n",
+      "zoom": false,
+      "hold": 0.8
+    },
+    {
+      "press": "n",
+      "zoom": false
+    },
+    {
+      "highlight": "css=.card[data-bed=\"12\"]",
+      "say": "At eleven twenty, the transport provider cancels. The board turns amber, and the clerk tells the transport agent straight away."
+    },
+    {
+      "press": "n",
+      "zoom": false
+    },
+    {
+      "highlight": "css=aside",
+      "text": "Every approval is a nurse's",
+      "say": "It finds the next safe slot, twelve thirty, and a nurse approves it. Every change is recorded: who did it, and who said yes."
+    },
+    {
+      "press": "n",
+      "zoom": false,
+      "hold": 0.6
+    },
+    {
+      "click": "css=.card[data-bed=\"12\"]",
+      "say": "Margaret goes home at twelve forty, not ten past seven. That's six and a half hours of her day back, and a bed for the next patient."
+    },
+    {
+      "zoomTo": "css=#story .daytrack",
+      "hold": 1.5
+    },
+    {
+      "press": "Escape",
+      "zoom": false
+    },
+    {
+      "scroll": "top",
+      "zoom": false
+    },
+    {
+      "highlight": "text=3 · 0",
+      "text": "3 nurse approvals · 0 clinical calls by agents",
+      "say": "Agents did the chasing. Nurses approved every action. And the agents made zero clinical decisions.",
+      "hold": 0.8
+    },
+    {
+      "wait": 1,
+      "zoom": false,
+      "say": "Homeward. Dashboards show who's stuck. Homeward gets them home.",
+      "hold": 1.6
+    }
+  ]
+}

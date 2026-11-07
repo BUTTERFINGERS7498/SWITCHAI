@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homeward · the problem</title>
+<style>
+  :root { --bg: #0f1a22; --ink: #eef3f6; --muted: #9fb0bc; --green: #5fd39a; --amber: #f0c060; --red: #ff8a80;
+          --blue: #8ab4ff; --violet: #c3b0ff; --card: #172430; --line: #263744; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: radial-gradient(1200px 700px at 30% 20%, #16303a 0%, var(--bg) 60%); color: var(--ink);
+               font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; overflow: hidden; }
+  .scene { position: absolute; inset: 0; display: grid; place-items: center; padding: 6vh 7vw; opacity: 0; pointer-events: none;
+           transition: opacity .7s ease; }
+  .scene.on { opacity: 1; }
+  .scene.on .rise { animation: rise .9s cubic-bezier(.2,.8,.2,1) both; }
+  .scene.on .rise.d1 { animation-delay: .35s; } .scene.on .rise.d2 { animation-delay: .7s; } .scene.on .rise.d3 { animation-delay: 1.05s; }
+  .scene.on .rise.d4 { animation-delay: 1.4s; } .scene.on .rise.d5 { animation-delay: 1.75s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+  h1 { font-size: clamp(40px, 6.2vw, 112px); margin: 0; letter-spacing: -1.5px; line-height: 1.02; }
+  h2 { font-size: clamp(28px, 3.6vw, 64px); margin: 0 0 3vh; letter-spacing: -.6px; line-height: 1.1; }
+  p.lede { font-size: clamp(18px, 1.9vw, 34px); color: var(--muted); margin: 2.4vh 0 0; max-width: 60ch; line-height: 1.35; }
+  .center { text-align: center; }
+  .accent { color: var(--green); } .warn { color: var(--amber); } .bad { color: var(--red); }
+
+  /* scene 1: Margaret */
+  .person { display: flex; align-items: center; gap: 4vw; }
+  .avatar { width: clamp(140px, 15vw, 260px); aspect-ratio: 1; border-radius: 50%; background: linear-gradient(160deg, #2b4a58, #1b2e38);
+            display: grid; place-items: center; box-shadow: 0 0 0 8px rgba(95,211,154,.12); }
+  .avatar svg { width: 62%; }
+  .tag { display: inline-block; font-size: clamp(14px, 1.2vw, 22px); color: var(--green); background: rgba(95,211,154,.12);
+         padding: 6px 14px; border-radius: 999px; margin-bottom: 2vh; font-weight: 650; }
+
+  /* scene 2: the clock */
+  .clockwrap { display: flex; align-items: center; gap: 5vw; }
+  .clock { width: clamp(220px, 26vw, 460px); aspect-ratio: 1; }
+  .clock .hand-h, .clock .hand-m { transform-origin: 100px 100px; }
+  .scene.on .clock .hand-h { animation: hour 5.5s cubic-bezier(.45,.05,.3,1) .4s both; }
+  .scene.on .clock .hand-m { animation: minute 5.5s cubic-bezier(.45,.05,.3,1) .4s both; }
+  .scene.on .clock .arc { animation: arc 5.5s cubic-bezier(.45,.05,.3,1) .4s both; }
+  @keyframes hour { from { transform: rotate(300deg); } to { transform: rotate(575deg); } }
+  @keyframes minute { from { transform: rotate(0deg); } to { transform: rotate(3300deg); } }
+  @keyframes arc { from { stroke-dashoffset: 503; } to { stroke-dashoffset: 120; } }
+  .times { font: 700 clamp(46px, 6vw, 110px)/1 ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  .times span { display: block; }
+  .times small { display: block; font: 600 clamp(16px, 1.4vw, 26px) "Segoe UI", sans-serif; color: var(--muted); margin: 6px 0 22px; }
+
+  /* scene 3: numbers */
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3vw; width: min(1500px, 100%); }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 4vh 2.4vw; }
+  .stat b { display: block; font-size: clamp(44px, 5.4vw, 100px); letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: clamp(16px, 1.5vw, 28px); line-height: 1.3; display: block; margin-top: 1vh; }
+  .beds { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-top: 2.2vh; }
+  .beds i { aspect-ratio: 1.6; border-radius: 5px; background: #2a3f4c; }
+  .scene.on .beds i.stuck { animation: stuck .6s ease 1.6s both; }
+  @keyframes stuck { to { background: var(--red); } }
+  .source { position: absolute; bottom: 4vh; left: 7vw; right: 7vw; color: #6f8291; font-size: clamp(12px, .95vw, 17px); }
+
+  /* scene 4: four blockers */
+  .blockers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2vw; width: min(1600px, 100%); }
+  .blk { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 3.6vh 1.8vw; }
+  .blk .ic { font-size: clamp(36px, 3.6vw, 66px); }
+  .blk h3 { font-size: clamp(20px, 1.8vw, 34px); margin: 1.4vh 0 .8vh; }
+  .blk p { margin: 0; color: var(--muted); font-size: clamp(15px, 1.25vw, 23px); line-height: 1.35; }
+
+  /* scene 5: chat chaos */
+  .chaos { position: relative; width: min(1500px, 100%); height: 70vh; }
+  .bubble { position: absolute; background: #1f3340; border: 1px solid var(--line); color: var(--ink); padding: 1.3vh 1.2vw;
+            border-radius: 18px 18px 18px 4px; font-size: clamp(15px, 1.35vw, 25px); max-width: 30ch; opacity: 0; }
+  .bubble b { display: block; font-size: .72em; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+  .scene.on .bubble { animation: pop .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes pop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
+  .verdict { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 0;
+             background: rgba(15,26,34,.92); padding: 4vh 4vw; border-radius: 26px; border: 1px solid var(--line); }
+  .scene.on .verdict { animation: rise .9s cubic-bezier(.2,.8,.2,1) 4.6s both; }
+
+  /* scene 6: Homeward */
+  .room { display: grid; grid-template-columns: 1fr auto 1fr; gap: 3vw; align-items: center; width: min(1600px, 100%); }
+  .col { display: grid; gap: 2vh; }
+  .chip { display: flex; align-items: center; gap: 1vw; background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+          padding: 1.8vh 1.4vw; font-size: clamp(18px, 1.6vw, 30px); }
+  .chip small { display: block; color: var(--muted); font-size: .65em; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+  .hub { width: clamp(230px, 22vw, 400px); aspect-ratio: 1; border-radius: 34px; background: linear-gradient(160deg, #1d3b33, #13262b);
+         border: 2px solid var(--green); display: grid; place-items: center; text-align: center; padding: 2vw; box-shadow: 0 0 80px rgba(95,211,154,.18); }
+  .hub b { font-size: clamp(22px, 2vw, 38px); } .hub span { color: var(--muted); font-size: clamp(14px, 1.2vw, 22px); }
+  .rules { display: flex; justify-content: center; gap: 4vw; margin-top: 5vh; font-size: clamp(22px, 2.3vw, 42px); font-weight: 700; }
+  .rules span:nth-child(1) { color: var(--blue); } .rules span:nth-child(2) { color: var(--violet); } .rules span:nth-child(3) { color: var(--green); }
+
+  .logo { display: inline-flex; align-items: center; gap: 1.4vw; }
+  .logo svg { width: clamp(64px, 6vw, 120px); }
+  .progress { position: absolute; bottom: 2.4vh; right: 3vw; display: flex; gap: 8px; }
+  .progress i { width: 26px; height: 4px; border-radius: 4px; background: #2a3a46; }
+  .progress i.on { background: var(--green); }
+  @media (prefers-reduced-motion: reduce) { .scene.on * { animation-duration: .01s !important; animation-delay: 0s !important; } }
+</style>
+</head>
+<body>
+
+<section class="scene" data-s="1" aria-label="Margaret">
+  <div class="person">
+    <div class="avatar rise" aria-hidden="true">
+      <svg viewBox="0 0 100 100"><circle cx="50" cy="36" r="18" fill="#cfe3ea"/><path d="M18 92c4-20 18-30 32-30s28 10 32 30" fill="#cfe3ea"/></svg>
+    </div>
+    <div>
+      <div class="tag rise d1">10:00 · Ward 7</div>
+      <h1 class="rise d2">Margaret, 82</h1>
+      <p class="lede rise d3">Her doctor says she is <span class="accent">well enough to go home</span>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-s="2" aria-label="Nine hours">
+  <div class="clockwrap">
+    <svg class="clock rise" viewBox="0 0 200 200" aria-hidden="true">
+      <circle cx="100" cy="100" r="88" fill="#14232c" stroke="#2a3f4c" stroke-width="4"/>
+      <circle class="arc" cx="100" cy="100" r="80" fill="none" stroke="#ff8a80" stroke-width="8" stroke-dasharray="503" stroke-dashoffset="503"
+              transform="rotate(-90 100 100)" opacity=".85"/>
+      <g stroke="#55707f" stroke-width="3">
+        <line x1="100" y1="22" x2="100" y2="32"/><line x1="178" y1="100" x2="168" y2="100"/><line x1="100" y1="178" x2="100" y2="168"/><line x1="22" y1="100" x2="32" y2="100"/>
+      </g>
+      <line class="hand-h" x1="100" y1="100" x2="100" y2="58" stroke="#eef3f6" stroke-width="7" stroke-linecap="round"/>
+      <line class="hand-m" x1="100" y1="100" x2="100" y2="36" stroke="#9fb0bc" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="6" fill="#eef3f6"/>
+    </svg>
+    <div class="times">
+      <span class="rise">10:00</span><small class="rise">told she can go home</small>
+      <span class="rise d5 bad">19:10</span><small class="rise d5">actually leaves the ward</small>
+    </div>
+  </div>
+  <p class="lede rise d5 center" style="position:absolute;bottom:9vh;left:0;right:0;margin:auto">Not one minute of those nine hours was medical.</p>
+</section>
+
+<section class="scene" data-s="3" aria-label="The scale">
+  <div style="width:100%;display:grid;place-items:center">
+    <h2 class="rise center">She is not alone.</h2>
+    <div class="stats">
+      <div class="stat rise d1"><b class="warn">13,000</b><span>people a day in England, medically fit but still in a hospital bed</span></div>
+      <div class="stat rise d2"><b class="bad">1 in 10</b><span>hospital beds</span>
+        <div class="beds" aria-hidden="true"><i></i><i></i><i></i><i class="stuck"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      <div class="stat rise d3"><b class="warn">£2.7bn</b><span>a year, at £562 per bed-day</span></div>
+    </div>
+  </div>
+  <p class="source">Figures: NHS England delayed-discharge data, as summarised in the project's research dossier.</p>
+</section>
+
+<section class="scene" data-s="4" aria-label="Why">
+  <div style="width:100%;display:grid;place-items:center">
+    <h2 class="rise center">The delay is <span class="warn">coordination</span>, not medicine.</h2>
+    <div class="blockers">
+      <div class="blk rise d1"><div class="ic">💊</div><h3>Medicines</h3><p>Discharge prescriptions are written late. Pharmacy is the most-cited delay.</p></div>
+      <div class="blk rise d2"><div class="ic">🚑</div><h3>Transport</h3><p>Booked late, or for the wrong time: the crew arrives before the medicines.</p></div>
+      <div class="blk rise d3"><div class="ic">📝</div><h3>Paperwork</h3><p>The discharge letter waits for a signature.</p></div>
+      <div class="blk rise d4"><div class="ic">📱</div><h3>The chase</h3><p>Phone calls and WhatsApp groups. Nobody owns it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="scene" data-s="5" aria-label="Nobody owns the chase">
+  <div class="chaos">
+    <div class="bubble" style="left:2%;top:4%;animation-delay:.1s"><b>Ward nurse · 10:14</b>Is bed 12 ready to go?</div>
+    <div class="bubble" style="left:58%;top:2%;animation-delay:.5s"><b>Pharmacy · 11:02</b>TTO not received yet</div>
+    <div class="bubble" style="left:30%;top:18%;animation-delay:.9s"><b>Transport · 11:40</b>Crew here for Jones, where is she?</div>
+    <div class="bubble" style="left:6%;top:38%;animation-delay:1.3s"><b>Doctor · 12:15</b>Who needs the letter signing?</div>
+    <div class="bubble" style="left:64%;top:30%;animation-delay:1.7s"><b>Daughter · 13:30</b>Any idea what time Mum's coming home?</div>
+    <div class="bubble" style="left:36%;top:52%;animation-delay:2.1s"><b>Bed manager · 14:50</b>Need bed 12 for A&amp;E</div>
+    <div class="bubble" style="left:4%;top:70%;animation-delay:2.5s"><b>Ward nurse · 15:20</b>Transport cancelled, rebooking…</div>
+    <div class="bubble" style="left:60%;top:66%;animation-delay:2.9s"><b>Pharmacy · 16:05</b>Meds ready, collect from desk</div>
+    <div class="bubble" style="left:30%;top:84%;animation-delay:3.3s"><b>Transport · 18:40</b>Next slot 19:00</div>
+    <div class="verdict"><h2 style="margin:0">Nobody owns the chase.</h2>
+      <p class="lede" style="margin:1.6vh auto 0">Dashboards show who is stuck. Nobody works the queue.</p></div>
+  </div>
+</section>
+
+<section class="scene" data-s="6" aria-label="Homeward">
+  <div style="width:100%;display:grid;place-items:center">
+    <div class="logo rise" style="margin-bottom:4vh">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#5fd39a"/>
+        <path d="M9 21 L20 11 L31 21 M13 18 V30 H27 V18 M18 30 V24 H22 V30" fill="none" stroke="#0f1a22" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <h1>Homeward</h1>
+    </div>
+    <div class="room">
+      <div class="col">
+        <div class="chip rise d1"><i class="dot" style="background:#5fd39a"></i><div>Nurse<small>approves every action</small></div></div>
+        <div class="chip rise d2"><i class="dot" style="background:#5fd39a"></i><div>Doctor<small>keeps every clinical call</small></div></div>
+        <div class="chip rise d3"><i class="dot" style="background:#9fb0bc"></i><div>Hospital systems<small>EPR · pharmacy · transport</small></div></div>
+      </div>
+      <div class="hub rise"><div><b>#discharge-bed-12</b><br><span>one Switch room per patient</span></div></div>
+      <div class="col">
+        <div class="chip rise d1"><i class="dot" style="background:#8ab4ff"></i><div>@lead<small>owns the plan</small></div></div>
+        <div class="chip rise d2"><i class="dot" style="background:#8ab4ff"></i><div>@meds<small>chases the medicines</small></div></div>
+        <div class="chip rise d3"><i class="dot" style="background:#8ab4ff"></i><div>@transport<small>books the right time</small></div></div>
+      </div>
+    </div>
+    <div class="rules rise d4"><span>Agents chase.</span><span>Nurses approve.</span><span>Doctors decide.</span></div>
+  </div>
+</section>
+
+<div class="progress" aria-hidden="true"></div>
+
+<script>
+const scenes = [...document.querySelectorAll(".scene")];
+let i = 0;
+const prog = document.querySelector(".progress");
+prog.innerHTML = scenes.map(() => "<i></i>").join("");
+function show(n) {
+  i = Math.max(0, Math.min(scenes.length - 1, n));
+  scenes.forEach((s, k) => s.classList.toggle("on", k === i));
+  [...prog.children].forEach((d, k) => d.classList.toggle("on", k <= i));
+  document.title = "Scene " + (i + 1);
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === " ") show(i + 1);
+  if (e.key === "ArrowLeft") show(i - 1);
+});
+show(0);
+</script>
+</body>
+</html>

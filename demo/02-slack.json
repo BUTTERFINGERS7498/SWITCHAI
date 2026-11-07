@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gmpetrov/agent-screenplay/main/schema/scenario.schema.json",
+  "url": "https://app.slack.com/client/T0CFB5Q9J1G/C0CF7M75C8P",
+  "auth": { "storageState": ".screenplay/auth.json" },
+  "style": { "background": { "gradient": ["#0f1a22", "#16303a"], "angle": 135 }, "padding": 56, "radius": 16, "shadow": true, "frame": "browser", "maxZoom": 1.7, "captions": true },
+  "voice": { "enabled": false, "language": "en" },
+  "steps": [
+    { "wait": "text=EPR update: Dr Raj has declared Margaret Jones" },
+    { "highlight": "text=EPR update: Dr Raj has declared Margaret Jones", "say": "Here it is in a real Slack workspace, connected through Switch. When the doctor marks Margaret fit in the hospital system, our ward clerk agent tells the ward room, and addresses the discharge lead.", "hold": 0.6 },
+    { "goto": "https://app.slack.com/client/T0CFB5Q9J1G/C0CF7M99WKH", "zoom": false },
+    { "wait": "text=confirmed fit in the hospital system" },
+    { "highlight": "text=confirmed fit in the hospital system", "say": "The lead checks the hospital system first, then hands the work out to the medicines and transport agents, by their jobs in the room.", "hold": 0.4 },
+    { "highlight": "text=Book wheelchair pickup 12:15", "say": "The transport agent books for when the medicines will actually be ready, not as soon as possible.", "hold": 0.4 },
+    { "highlight": "text=Your message likely crossed mine", "say": "The agents check each other's work, in plain sight of the team.", "hold": 0.4 },
+    { "highlight": "text=approved by nurse-amy", "say": "And nothing leaves the room without a nurse's yes, on Switch's approval card.", "hold": 0.8 }
+  ]
+}

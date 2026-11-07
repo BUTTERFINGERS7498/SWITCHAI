@@ -10,3 +10,11 @@ dist/
 .pytest_cache/
 .DS_Store
 .homeward/
+.screenplay/
+demo/.screenplay/
+demo/voice-cache/
+demo/*.mp4
+demo/*.gif
+demo/*.storyboard.png
+demo/.frames/
+demo/voice/

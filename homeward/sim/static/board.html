@@ -379,7 +379,7 @@ function render() {
   });
   const focusBed = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.bed : null;
   $("people").replaceChildren(...(shown.length ? shown.map(p => personCard(p, d.now)) : [el("p", "note", "Nobody in this view right now.")]));
-  if (focusBed) { const again = document.querySelector('.card[data-bed="' + focusBed + '"]'); if (again) again.focus(); }
+  if (focusBed) { const again = document.querySelector('.card[data-bed="' + focusBed + '"]'); if (again) again.focus({ preventScroll: true }); }
   const names = Object.fromEntries(d.beds.map(b => [b.bed, b.name]));
   const rows = labelRows(d.ledger, d).slice().reverse();
   $("ledger").replaceChildren(...(rows.length ? rows.map(r => ledgerLine(r, names)) : [el("li", "note", "Nothing has happened yet.")]));
@@ -410,7 +410,7 @@ async function renderStory() {
 
 function openStory(bed) { state.open = bed; renderStory(); const dlg = $("story"); if (!dlg.open) dlg.showModal(); }
 $("story-close").addEventListener("click", () => $("story").close());
-$("story").addEventListener("close", () => { const bed = state.open; state.open = null; const c = document.querySelector('.card[data-bed="' + bed + '"]'); if (c) c.focus(); });
+$("story").addEventListener("close", () => { const bed = state.open; state.open = null; const c = document.querySelector('.card[data-bed="' + bed + '"]'); if (c) c.focus({ preventScroll: true }); });
 $("copy").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("story-handover").textContent); $("copy").textContent = "Copied ✓"; }
   catch (e) { $("copy").textContent = "Select and copy"; }
@@ -429,7 +429,8 @@ $("filters").addEventListener("keydown", e => {
 });
 function pref(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 function applyPrefs() {
-  const size = pref("hw-size") === "large", theme = pref("hw-theme");
+  const q = new URLSearchParams(location.search);
+  const size = (q.get("size") || pref("hw-size")) === "large", theme = q.get("theme") || pref("hw-theme");
   document.documentElement.dataset.size = size ? "large" : "";
   $("size").setAttribute("aria-pressed", String(size));
   if (theme) document.documentElement.dataset.theme = theme; else delete document.documentElement.dataset.theme;
@@ -445,12 +446,23 @@ async function tick() {
   try {
     const r = await fetch("/board/ward", { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
-    state.data = await r.json();
+    const text = await r.text();
+    if (text === state.lastText) { $("live").classList.remove("off"); $("live").lastChild.textContent = "Live"; return; }
+    state.lastText = text;
+    state.data = JSON.parse(text);
     $("live").classList.remove("off"); $("live").lastChild.textContent = "Live";
     render();
   } catch (e) {
     $("live").classList.add("off"); $("live").lastChild.textContent = "Offline: is the sim running?";
   }
+}
+// Presenter mode for filming (/board?presenter=1): "n" = next beat of Margaret's day, "r" = reset. No visible UI.
+if (new URLSearchParams(location.search).get("presenter") === "1") {
+  document.addEventListener("keydown", async e => {
+    if (e.target.closest("input, textarea, dialog[open]")) return;
+    if (e.key === "n") { await fetch("/demo/next", { method: "POST" }); tick(); }
+    if (e.key === "r") { await fetch("/reset", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" }); tick(); }
+  });
 }
 tick(); setInterval(tick, POLL_MS);
 </script>
