@@ -24,3 +24,5 @@ demo/voice/
 SJR*
 demo/.voice-venv/
 demo/voice-ref/
+demo/voice-test.*
+demo/voice/_tmp/
