@@ -10,11 +10,11 @@
 
 **AI agents and the people on a hospital ward share one [Switch](https://github.com/sandbox-quantum/switch) room per patient. The agents chase medicines, transport and paperwork; a nurse approves every outward action; clinicians keep every clinical decision.**
 
-[Quick start](#-quick-start) · [Margaret's day](#-margarets-day) · [Why Switch](#-why-it-needs-switch-the-unplug-test) · [How it works](#-how-it-works) · [Safety](#-safety-by-construction) · [Docs](docs/)
+[Live replay](https://butterfingers7498.github.io/SWITCHAI/) · [Quick start](#-quick-start) · [Margaret's day](#-margarets-day) · [Why Switch](#-why-it-needs-switch-the-unplug-test) · [How it works](#-how-it-works) · [Safety](#-safety-by-construction) · [Docs](docs/)
 
 ### 🎥 Watch the demo
 
-**[▶ Watch the demo video (3:29)](https://youtu.be/vKqCjuzPtyU)**
+**[▶ Watch the demo video (3:29)](https://youtu.be/vKqCjuzPtyU)** · **[Try it now, no install: replay Margaret's day](https://butterfingers7498.github.io/SWITCHAI/)**
 
 <sub>By <b>Team RE:SET</b> · built during the <b>Flip the Switch</b> hackathon (WeMakeDevs × DevTools Academy × Switch), Track 01: Best Business Workflow.</sub>
 
