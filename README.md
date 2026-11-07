@@ -4,7 +4,7 @@
 
 <br />
 
-[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-80%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-TBD-lightgrey?style=flat)
+[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-89%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-TBD-lightgrey?style=flat)
 
 ![Switch](https://img.shields.io/badge/Switch-0.31-1d2730?style=for-the-badge) ![Claude Code](https://img.shields.io/badge/Claude%20Code-agents-D97757?style=for-the-badge&logo=anthropic&logoColor=white) ![Slack](https://img.shields.io/badge/Slack-rooms-4A154B?style=for-the-badge&logo=slack&logoColor=white) ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-sim-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 
@@ -127,6 +127,7 @@ Take Switch away and the agents can't see the ward, can't hand work to each othe
 | **Room documents** | `discharge-plan-bed-N` checklist, written and updated by `@lead` | No durable checklist in the room |
 | **Linked rooms** | `#ward-7` ↔ `#discharge-bed-12` | The ward hub and patient rooms are islands |
 | **Follow-ups in threads** | Replies continue a thread without re-tagging | Every message needs an `@mention` |
+| **Custom agent over the agent protocol** | `ward-clerk` (no LLM): registered with `POST /agents`, posts hospital events to the rooms | Nothing tells the agents what the hospital systems did until a human relays it |
 | **Multi-agent, any harness** | Three Claude Code sessions, managed by Switch Console | One agent per chat, no division of work |
 
 ---
@@ -208,7 +209,7 @@ Needs Python 3.12+. Built and run on Windows 11; CI runs the tests on Ubuntu and
 git clone https://github.com/BUTTERFINGERS7498/SWITCHAI.git
 cd SWITCHAI
 python scripts/homeward.py setup      # creates .venv, installs requirements
-python scripts/homeward.py test       # 80 tests: contract, engine, API, CLI, scenario
+python scripts/homeward.py test       # 89 tests: contract, engine, API, CLI, scenario, clerk
 python scripts/homeward.py demo       # simulator + board on http://127.0.0.1:8765
 ```
 
@@ -225,7 +226,8 @@ Then open **http://127.0.0.1:8765/board**. API docs are at `/docs`.
 1. Install [Switch Console](https://github.com/sandbox-quantum/switch/releases) and start a local server.
 2. Connect Slack with [`switch/slack-app-manifest.json`](switch/slack-app-manifest.json) (Socket Mode, so no public URL is needed).
 3. Follow [`switch/SETUP.md`](switch/SETUP.md): channels, three agents (**Directory must be this repo folder**), room instructions, jobs, links.
-4. Keep `python scripts/homeward.py demo` running, then run the live day:
+4. Register and run the ward clerk (`python scripts/homeward.py clerk register --login`, then `clerk run`; see `switch/SETUP.md` section 8).
+5. Keep `python scripts/homeward.py demo` running, then run the live day:
 
 ```bash
 python scripts/homeward.py scenario margaret     # drives the clock and hospital events, pauses for Slack
@@ -239,6 +241,7 @@ python scripts/homeward.py scenario margaret     # drives the clock and hospital
 |---|---|---|---|
 | `discharge-lead` | `@lead` (exclusive) | Confirms fitness in the EPR, posts the plan, keeps the checklist document, hands off, answers "what's left?" | Declares fitness, signs the letter |
 | `pharmacy-liaison` | `@meds` | Sends and tracks the TTO request, tells `@transport` the ready time | Changes medicines, sets TTO status |
+| `ward-clerk` | (no job) | Deterministic, no LLM: watches the simulator and posts EPR, pharmacy and transport events to the rooms, addressing the owning job | Change any hospital state |
 | `transport-liaison` | `@transport` | Reads the earliest safe pickup, proposes a slot, books with a nurse's approval, rebooks on cancellation | Books before the meds and letter are ready, names an approver who didn't approve |
 
 All three are Claude Code sessions run by Switch Console, with the role files in [`switch/roles/`](switch/roles/). Project permissions in [`.claude/settings.json`](.claude/settings.json) allow `homeward.py read` and require approval for `homeward.py write`.
@@ -294,11 +297,13 @@ homeward/
   contracts.py        shared types, transition table, rules (contract v1.2.0)
   engine.py           readiness engine: pure functions, `now` is always an input
   scenario.py         the demo day: live (pauses for Slack) or --auto
+  clerk.py            ward-clerk: Switch agent that announces hospital events (register / rooms / run)
   sim/                FastAPI simulator: state.py, seed.py (Ward 7), app.py, static/board.html
 scripts/homeward.py   one cross-platform entrypoint: setup · test · demo · scenario · read · write
+demo/                 demo-video scenarios (Screenplay) and voice scripts; the video itself is not in git
 switch/               Switch setup: SETUP.md, room-instructions.md, roles/*.md, slack-app-manifest.json
 .claude/settings.json agent permissions: read allowed, write asks
-tests/                80 tests (contract 9, engine 34, API 25, CLI 9, scenario 3)
+tests/                89 tests (contract 9, engine 34, API 26, CLI 9, scenario 3, clerk 8)
 docs/                 ARCHITECTURE, DECISIONS (34 recorded), SPIKE, TEST_RUN_LIVE, IMPLEMENTATION_PLAN
 ```
 
@@ -313,7 +318,7 @@ docs/                 ARCHITECTURE, DECISIONS (34 recorded), SPIKE, TEST_RUN_LIV
 
 - **Synthetic hospital.** The EPR, pharmacy and transport are simulated; there are no real NHS integrations.
 - **The actor on an API write is declared by the caller.** In the Switch deployment the real approver is whoever clicked the approval card, and Switch records it; the hospital ledger takes the nurse from the room roster.
-- **Agents act when addressed.** Nothing pushes simulator events into Slack yet, so after the 11:20 cancellation a nurse prompts `@transport` (the board shows the amber blocker).
+- **LLM agents act when addressed.** The deterministic `ward-clerk` closes that gap by announcing hospital events (EPR, pharmacy, transport) to the rooms and addressing the owning job; we verified live that its EPR announcement reached `@lead`, which acted on it. Its other announcements (e.g. the 11:20 cancellation to `@transport`) are covered by unit tests; agent wording and timing vary between runs.
 - **One ward, one approving human** in the demo. Switch links in Slack resolve only on the machine running the server (local, self-hosted).
 - **Capacity isn't created.** Days-long delays waiting for care-home beds or care packages are out of scope; Doris (bed 7) stays blocked on purpose.
 
@@ -322,11 +327,11 @@ docs/                 ARCHITECTURE, DECISIONS (34 recorded), SPIKE, TEST_RUN_LIV
 ## 🗺️ Roadmap
 
 - [x] Readiness engine with clinical / approval / timing rules and 34 tests
+- [x] Deterministic `ward-clerk` agent over the Switch agent protocol, announcing hospital events to the rooms
 - [x] Simulated hospital with scenario clock and curveball events
 - [x] Three Claude Code agents in Switch with jobs, approvals and room documents
 - [x] Live end-to-end run in Slack, plus a deterministic `--auto` scenario
 - [x] Person-first ward board
-- [ ] Push simulator events into the room (a deterministic "ward clerk" agent over the Switch agent protocol)
 - [ ] "Expected fit tomorrow" pre-staging of TTO and provisional transport
 - [ ] Care-handover agent for pathways 1–3
 - [ ] Mixed-vendor rooms (Claude Code + Codex)
