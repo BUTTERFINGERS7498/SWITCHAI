@@ -4,7 +4,7 @@
 
 <br />
 
-[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-89%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-TBD-lightgrey?style=flat)
+[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-89%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-MIT-0b6e4f?style=flat)
 
 ![Switch](https://img.shields.io/badge/Switch-0.31-1d2730?style=for-the-badge) ![Claude Code](https://img.shields.io/badge/Claude%20Code-agents-D97757?style=for-the-badge&logo=anthropic&logoColor=white) ![Slack](https://img.shields.io/badge/Slack-rooms-4A154B?style=for-the-badge&logo=slack&logoColor=white) ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-sim-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 
@@ -348,7 +348,7 @@ Issues and pull requests are welcome. Run `python scripts/homeward.py test` befo
 
 ## 📄 License
 
-**[License: to be chosen]** <!-- TODO: add a LICENSE file (e.g. MIT) and update this section and the badge -->
+[MIT](LICENSE) © 2026 Team RE:SET.
 
 ## 🙌 Team RE:SET
 
