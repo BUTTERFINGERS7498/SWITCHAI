@@ -318,7 +318,7 @@ docs/                 ARCHITECTURE, DECISIONS (34 recorded), SPIKE, TEST_RUN_LIV
 
 - **Synthetic hospital.** The EPR, pharmacy and transport are simulated; there are no real NHS integrations.
 - **The actor on an API write is declared by the caller.** In the Switch deployment the real approver is whoever clicked the approval card, and Switch records it; the hospital ledger takes the nurse from the room roster.
-- **LLM agents act when addressed.** The deterministic `ward-clerk` closes that gap by announcing hospital events (EPR, pharmacy, transport) to the rooms and addressing the owning job; we verified live that its EPR announcement reached `@lead`, which acted on it. Its other announcements (e.g. the 11:20 cancellation to `@transport`) are covered by unit tests; agent wording and timing vary between runs.
+- **LLM agents act when addressed.** The deterministic `ward-clerk` closes that gap by announcing hospital events (EPR, pharmacy, transport) to the rooms and addressing the owning job; in our live run its EPR announcement reached `@lead`, which acted on it. Agent wording and timing vary between runs.
 - **One ward, one approving human** in the demo. Switch links in Slack resolve only on the machine running the server (local, self-hosted).
 - **Capacity isn't created.** Days-long delays waiting for care-home beds or care packages are out of scope; Doris (bed 7) stays blocked on purpose.
 
