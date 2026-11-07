@@ -6,6 +6,7 @@
   python scripts/homeward.py demo [--port N]    start the simulator + board on http://127.0.0.1:8765
   python scripts/homeward.py scenario margaret [--auto]   run the demo day (needs `demo` running)
   python scripts/homeward.py clerk register|rooms|run     ward-clerk Switch agent (see homeward/clerk.py)
+  python scripts/homeward.py site                         write docs/index.html: static replay of Margaret's day (GitHub Pages)
 
 Agent tools (talk to the running sim; base URL from HOMEWARD_URL, default http://127.0.0.1:8765):
   python scripts/homeward.py read <path>                   GET only, e.g. read patients/12/blocker
@@ -176,13 +177,20 @@ def cmd_write(args):
     return emit(path, status, out)
 
 
+def cmd_site(args):
+    sys.path.insert(0, str(ROOT))
+    from homeward import export_site
+    print(f"wrote {export_site.build()}")
+    return 0
+
+
 def cmd_clerk(args):
     sys.path.insert(0, str(ROOT))
     from homeward import clerk
     return clerk.main(args)
 
 
-COMMANDS = {"setup": cmd_setup, "test": cmd_test, "demo": cmd_demo, "scenario": cmd_scenario, "clerk": cmd_clerk,
+COMMANDS = {"setup": cmd_setup, "test": cmd_test, "demo": cmd_demo, "scenario": cmd_scenario, "clerk": cmd_clerk, "site": cmd_site,
             "read": cmd_read, "write": cmd_write}
 
 

@@ -4,7 +4,7 @@
 
 <br />
 
-[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-89%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-MIT-0b6e4f?style=flat)
+[![CI](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml/badge.svg)](https://github.com/BUTTERFINGERS7498/SWITCHAI/actions/workflows/ci.yml) ![Tests](https://img.shields.io/badge/tests-94%20passing-0b6e4f?style=flat) ![Clinical calls by agents](https://img.shields.io/badge/clinical%20calls%20by%20agents-0-5b3cc4?style=flat) ![Data](https://img.shields.io/badge/data-100%25%20synthetic-8a5a00?style=flat) ![License](https://img.shields.io/badge/license-MIT-0b6e4f?style=flat)
 
 ![Switch](https://img.shields.io/badge/Switch-0.31-1d2730?style=for-the-badge) ![Claude Code](https://img.shields.io/badge/Claude%20Code-agents-D97757?style=for-the-badge&logo=anthropic&logoColor=white) ![Slack](https://img.shields.io/badge/Slack-rooms-4A154B?style=for-the-badge&logo=slack&logoColor=white) ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-sim-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 
@@ -102,6 +102,18 @@ Margaret Jones, 82, uses a wheelchair, and is going home with no new support. Sh
 | **12:40** | **Margaret goes home**, not at 19:10 | crew (simulated) |
 
 **Result (from `scenario margaret --auto`, asserted in the test suite):** home at **12:40 instead of 19:10**, **6.5 bed-hours freed** (about £152), **2 nurse approvals**, **6 agent actions**, **0 clinical actions by agents**.
+
+### Does it hold up when things go wrong?
+
+The same day, re-run with the pharmacy running late (a hospital-system event, not something the agents control). The agents re-plan: transport is booked for 20 minutes after the *new* medicines time, the 11:20 cancellation is rebooked, and nobody does anything clinical.
+
+| Pharmacy delay | Medicines ready | First pickup | After the 11:20 cancellation | Home | Hours handed back vs a usual day | Nurse approvals |
+|---|---|---|---|---|---|---|
+| none | 11:45 | 12:15 | 12:30 | **12:40** | 6.5 | 2 |
+| +30 min | 12:15 | 12:45 | 13:00 | **13:10** | 6.0 | 2 |
+| +60 min | 12:45 | 13:15 | 13:30 | **13:40** | 5.5 | 2 |
+
+Run it yourself: `python scripts/homeward.py scenario margaret --auto --delay 30` (asserted in `tests/test_scenario.py`). Doris (bed 7) shows the case that doesn't resolve: she stays **blocked on a care-home bed** all day, because Homeward chases coordination and cannot create capacity.
 
 <details>
 <summary><b>What a real Slack run looked like</b></summary>
@@ -209,7 +221,7 @@ Needs Python 3.12+. Built and run on Windows 11; CI runs the tests on Ubuntu and
 git clone https://github.com/BUTTERFINGERS7498/SWITCHAI.git
 cd SWITCHAI
 python scripts/homeward.py setup      # creates .venv, installs requirements
-python scripts/homeward.py test       # 89 tests: contract, engine, API, CLI, scenario, clerk
+python scripts/homeward.py test       # 94 tests: contract, engine, API, CLI, scenario, clerk, site
 python scripts/homeward.py demo       # simulator + board on http://127.0.0.1:8765
 ```
 
@@ -303,7 +315,7 @@ scripts/homeward.py   one cross-platform entrypoint: setup · test · demo · sc
 demo/                 demo-video scenarios (Screenplay) and voice scripts; the video itself is not in git
 switch/               Switch setup: SETUP.md, room-instructions.md, roles/*.md, slack-app-manifest.json
 .claude/settings.json agent permissions: read allowed, write asks
-tests/                89 tests (contract 9, engine 34, API 26, CLI 9, scenario 3, clerk 8)
+tests/                94 tests (contract 9, engine 34, API 26, CLI 9, scenario 6, clerk 8, site 2)
 docs/                 ARCHITECTURE, DECISIONS (34 recorded), SPIKE, TEST_RUN_LIVE, IMPLEMENTATION_PLAN
 ```
 

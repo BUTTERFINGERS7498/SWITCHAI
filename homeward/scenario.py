@@ -2,7 +2,7 @@
 
   python scripts/homeward.py scenario margaret          live demo: drives the clock and hospital events,
                                                          pauses for the humans and agents in Slack
-  python scripts/homeward.py scenario margaret --auto   no Slack: also plays the agents and the nurse,
+  python scripts/homeward.py scenario margaret --auto [--delay 30]   no Slack: also plays the agents and the nurse,
                                                          so anyone can see the whole day in one command
 
 The runner only ever plays the *hospital* (doctor's EPR entries, pharmacy, transport provider, the clock).
@@ -20,6 +20,7 @@ from datetime import datetime, timedelta
 BASE = os.environ.get("HOMEWARD_URL", "http://127.0.0.1:" + os.environ.get("HOMEWARD_PORT", "8765")).rstrip("/")
 DAY = "2026-11-07T"
 BED = 12
+DELAY = 0   # --delay N: the pharmacy runs N minutes late (a hospital system event, not an agent action)
 DOCTOR = {"id": "dr-raj", "role": "doctor", "type": "human"}
 NURSE = {"id": "nurse-amy", "role": "nurse", "type": "human"}
 LEAD = {"id": "discharge-lead", "role": "coordinator", "type": "agent"}
@@ -135,6 +136,9 @@ def margaret(auto: bool) -> int:
                  "          today, and her belongings are packed.   (approve the card(s))"])
     if auto:
         auto_tto()
+        if DELAY:
+            call("POST", "/events", {"type": "tto_delayed", "bed": BED, "minutes": DELAY})
+            print(f"  [pharmacy system] delayed {DELAY} min; medicines now ready {hhmm(call('GET', f'/patients/{BED}/tto')['ready_eta'])}")
         auto_book()
         auto_family_and_belongings()
     blocker_line()
@@ -208,6 +212,8 @@ def main(args: list[str]) -> int:
         print(f"unknown scenario {name}; known: {', '.join(SCENARIOS)}")
         return 2
     try:
+        global DELAY
+        DELAY = int(args[args.index("--delay") + 1]) if "--delay" in args else 0
         return SCENARIOS[name]("--auto" in args)
     except SimError as ex:
         print(f"\n  ERROR: {ex}")

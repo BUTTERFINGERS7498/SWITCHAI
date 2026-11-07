@@ -45,3 +45,14 @@ def test_unknown_scenario(base, monkeypatch):
 def test_sim_down(monkeypatch):
     monkeypatch.setattr(scenario, "BASE", "http://127.0.0.1:9")
     assert scenario.main(["margaret", "--auto"]) == 3
+
+
+@pytest.mark.parametrize("delay,leaves,freed", [(0, "12:40", "6.5"), (30, "13:10", "6.0"), (60, "13:40", "5.5")])
+def test_margaret_still_gets_home_when_pharmacy_runs_late(base, monkeypatch, capsys, delay, leaves, freed):
+    monkeypatch.setattr(scenario, "BASE", base)
+    args = ["margaret", "--auto"] + (["--delay", str(delay)] if delay else [])
+    assert scenario.main(args) == 0
+    out = capsys.readouterr().out
+    assert f"Margaret went home at {leaves} instead of 19:10." in out
+    assert f"freed vs baseline: {freed} h" in out
+    assert "clinical actions by agents: 0" in out
