@@ -14,7 +14,7 @@
 
 ### 🎥 Watch the demo
 
-**[▶ Watch the demo video (3:29)](https://youtu.be/MH0GedCY1M0?si=J3Plkd048jhJ26eL)** · **[Try it now, no install: replay Margaret's day](https://butterfingers7498.github.io/SWITCHAI/)**
+**[▶ Watch the demo video](https://youtu.be/MH0GedCY1M0?si=J3Plkd048jhJ26eL)** · **[Try it now, no install: replay Margaret's day](https://butterfingers7498.github.io/SWITCHAI/)**
 
 <sub>By <b>Team RE:SET</b> · built during the <b>Flip the Switch</b> hackathon (WeMakeDevs × DevTools Academy × Switch), Track 01: Best Business Workflow.</sub>
 
